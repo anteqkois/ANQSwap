@@ -59,7 +59,7 @@
   "sourceMap": "66:311:0:-;;;218:50;8:9:-1;5:2;;;30:1;27;20:12;5:2;218:50:0;253:10;245:5;;:18;;;;;;;;;;;;;;;;;;66:311;;;;;;",
   "deployedSourceMap": "66:311:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;66:311:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;114:36;;;:::i;:::-;;;;;;;;;;;;;;;;;;;90:20;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;272:103;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;272:103:0;;;;;;;;;;;;;;;;;:::i;:::-;;114:36;;;;:::o;90:20::-;;;;;;;;;;;;;:::o;272:103::-;201:5;;;;;;;;;;;187:19;;:10;:19;;;183:26;;;361:9;334:24;:36;;;;183:26;272:103;:::o",
   "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.4.21 <0.7.0;\n\ncontract Migrations {\n  address public owner;\n  uint public last_completed_migration;\n\n  modifier restricted() {\n    if (msg.sender == owner) _;\n  }\n\n  constructor() public {\n    owner = msg.sender;\n  }\n\n  function setCompleted(uint completed) public restricted {\n    last_completed_migration = completed;\n  }\n}\n",
-  "sourcePath": "D:\\programming\\first_simple-DAPP\\contracts\\Migrations.sol",
+  "sourcePath": "D:\\programming\\first-simple-dapp\\contracts\\Migrations.sol",
   "ast": {
     "absolutePath": "project:/contracts/Migrations.sol",
     "exportedSymbols": {
@@ -958,12 +958,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x196D2fFe2208970BeBb5c158A13c45c018a3706E",
-      "transactionHash": "0xe89705515aca007a44136457adf0eb5396a57d3cd02acf6f8d56ef548af2c008"
+      "address": "0xf39dB314B02F366a2cf9Ddb698D8c745259dAc8F",
+      "transactionHash": "0x1a04330d81157a9ce05071c01cf46b729bebda37773c7a7d06832a3a991187ce"
     }
   },
   "schemaVersion": "3.4.4",
-  "updatedAt": "2022-01-18T17:09:07.104Z",
+  "updatedAt": "2022-01-18T19:12:54.608Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}
