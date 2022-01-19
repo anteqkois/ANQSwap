@@ -37,7 +37,13 @@ contract AnteqToken{
   function balanceOf(address _owner) public view returns (uint256 balance){
     return _balanceOf[_owner];
   }
-  // function transfer(address _to, uint256 _value) public returns (bool success)
+
+  function transfer(address _to, uint256 _value) public returns (bool success){
+    require(_balanceOf[msg.sender] >= _value, 'Not enought token on sender address.');
+    _balanceOf[msg.sender] = _balanceOf[msg.sender] - _value;
+    _balanceOf[_to] = _value;
+    return true;
+  }
   // function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
   // function approve(address _spender, uint256 _value) public returns (bool success)
   // function allowance(address _owner, address _spender) public view returns (uint256 remaining)
