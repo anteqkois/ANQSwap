@@ -1,38 +1,50 @@
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.5.0 <0.9.0;
+// pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./AnteqToken.sol";
 
-contract ANQSwap {
+contract ANQSwap is Ownable{
     AnteqToken public anteqToken;
     uint256 public rate;
-    string public name = 'AnteqToken Swap';
+    string public name = "AnteqToken Swap";
 
-    constructor(AnteqToken _token, uint256 _rate) public {
+    constructor(AnteqToken _token, uint256 _rate) {
         anteqToken = _token;
         rate = _rate;
     }
 
-    event Buy
+    event BuyTokens(address indexed _buyer, uint256 _amount);
+    event SellTokens(address indexed _seller, uint256 _amount);
 
-    // add onlyOwner modifier
-    function setTokenAddress(AnteqToken _token) public returns (bool success) {
+    function setTokenAddress(AnteqToken _token) public onlyOwner returns(bool success) {
         anteqToken = _token;
         return true;
     }
 
-    function buyTokens() public payable{
-        uint256 amountAnteqToken = msg.value * rate;
-        require(anteqToken.balanceOf(address(this)) >= amountAnteqToken, "AnteqToken Swap havn't enought ANQ.");
-        anteqToken.transfer(msg.sender, amountAnteqToken);
-        // emit event
+    function buyTokens() public payable {
+        uint256 amountANQ = msg.value * rate;
+        require(
+            anteqToken.balanceOf(address(this)) >= amountANQ,
+            "AnteqToken Swap havn't enought ANQ."
+        );
+        anteqToken.transfer(msg.sender, amountANQ);
+        emit BuyTokens(msg.sender, amountANQ);
     }
 
     function sellTokens(uint256 _value) public {
-        require(anteqToken.balanceOf(msg.sender) >= _value, "You doesn't have enought AnteqToken.");
-        uint256 etherToSendBack = _value/rate;
-        require(address(this).balance >= etherToSendBack, "AnteqToken Swap doesn't have enought Ether to buy yours token.");
+        require(
+            anteqToken.balanceOf(msg.sender) >= _value,
+            "You doesn't have enought AnteqToken."
+        );
+        uint256 etherToSendBack = _value / rate;
+        require(
+            address(this).balance >= etherToSendBack,
+            "AnteqToken Swap doesn't have enought Ether to buy yours token."
+        );
         anteqToken.transferFrom(msg.sender, address(this), _value);
-        msg.sender.transfer(etherToSendBack);
-        //emit event
+        payable(msg.sender).transfer(etherToSendBack);
+        emit SellTokens(msg.sender, _value);
     }
 }

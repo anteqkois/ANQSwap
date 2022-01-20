@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
 contract AnteqToken {
@@ -9,7 +10,7 @@ contract AnteqToken {
     mapping(address => uint256) private _balanceOf;
     mapping(address => mapping(address => uint256)) private _allowance;
 
-    constructor() public {
+    constructor() {
         _balanceOf[msg.sender] = _totalSupply;
     }
 
@@ -78,6 +79,7 @@ contract AnteqToken {
         public
         returns (bool success)
     {
+        require(_spender != address(0));
         _allowance[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;

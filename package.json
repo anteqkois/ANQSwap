@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/anteqkois/first-simple-dapp#readme",
   "dependencies": {
+    "@openzeppelin/contracts": "^4.4.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^3.0.0"
