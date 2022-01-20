@@ -1,7 +1,8 @@
-const SimpleStorage = artifacts.require("./SimpleStorage.sol");
 const AnteqToken = artifacts.require('./AnteqToken.sol');
+const ANQSwap = artifacts.require('./ANQSwap.sol');
 
-module.exports = function(deployer) {
-  deployer.deploy(SimpleStorage);
-  deployer.deploy(AnteqToken);
+module.exports = async function(deployer) {
+  await deployer.deploy(AnteqToken);
+  const token = await AnteqToken.deployed();
+  await deployer.deploy(ANQSwap, token.address, 10);
 };

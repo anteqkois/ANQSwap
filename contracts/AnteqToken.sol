@@ -1,4 +1,4 @@
-pragma solidity >=0.4.24 <8.11.0;
+pragma solidity >=0.4.22 <0.9.0;
 
 contract AnteqToken {
     string private _name = "AnteqToken";
@@ -79,7 +79,15 @@ contract AnteqToken {
         returns (bool success)
     {
         _allowance[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    // function allowance(address _owner, address _spender) public view returns (uint256 remaining)
+
+    function allowance(address _owner, address _spender)
+        public
+        view
+        returns (uint256 remaining)
+    {
+        return _allowance[_owner][_spender];
+    }
 }

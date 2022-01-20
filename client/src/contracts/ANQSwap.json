@@ -1,0 +1,819 @@
+{
+  "contractName": "ANQSwap",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract AnteqToken",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "anteqToken",
+      "outputs": [
+        {
+          "internalType": "contract AnteqToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "contract AnteqToken",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "name": "setTokenAddress",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract AnteqToken\",\"name\":\"_token\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"anteqToken\",\"outputs\":[{\"internalType\":\"contract AnteqToken\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"contract AnteqToken\",\"name\":\"_token\",\"type\":\"address\"}],\"name\":\"setTokenAddress\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"project:/contracts/ANQSwap.sol\":\"ANQSwap\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/ANQSwap.sol\":{\"keccak256\":\"0x694496b554473ba63d87d9e25622818bdbc681985b3ca6084cba1653f59f2fe4\",\"urls\":[\"bzz-raw://b7353924ac16729587c89b2523ae2f89732a7c9b9c9f64b3de4a163c2460c22d\",\"dweb:/ipfs/QmUotcAn1r1JNCcGxQYyDfkQecqhCRdj2P4AtQBknzxJqo\"]},\"project:/contracts/AnteqToken.sol\":{\"keccak256\":\"0xee6e8b1d2c1361ec6f247d707f51a77051dadbe9dae3e8cb823ebfc455a7001c\",\"urls\":[\"bzz-raw://a7461cc282e741406b4c7424240e6582e11489dc8240af1ae1f0c5d07f644e5f\",\"dweb:/ipfs/QmUVhwX2oBteqSNWMgMKdFtBQyohDHpuwZXx4UqtapHFhQ\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5060405161021a38038061021a8339818101604052602081101561003357600080fd5b8101908080519060200190929190505050806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555050610186806100946000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c806326a4e8d21461003b578063fe907c1f14610097575b600080fd5b61007d6004803603602081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100e1565b604051808215151515815260200191505060405180910390f35b61009f61012c565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6000816000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060019050919050565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff168156fea265627a7a72315820133d173a2672b96d8cf9a65ff50284dd2b5709d8645075136de50232b081b24964736f6c63430005100032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c806326a4e8d21461003b578063fe907c1f14610097575b600080fd5b61007d6004803603602081101561005157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506100e1565b604051808215151515815260200191505060405180910390f35b61009f61012c565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6000816000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060019050919050565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff168156fea265627a7a72315820133d173a2672b96d8cf9a65ff50284dd2b5709d8645075136de50232b081b24964736f6c63430005100032",
+  "sourceMap": "62:301:0:-;;;120:74;8:9:-1;5:2;;;30:1;27;20:12;5:2;120:74:0;;;;;;;;;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;120:74:0;;;;;;;;;;;;;;;;181:6;168:10;;:19;;;;;;;;;;;;;;;;;;120:74;62:301;;;;;;",
+  "deployedSourceMap": "62:301:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;62:301:0;;;;;;;;;;;;;;;;;;;;;;;;230:131;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;230:131:0;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;85:28;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;230:131;290:12;327:6;314:10;;:19;;;;;;;;;;;;;;;;;;350:4;343:11;;230:131;;;:::o;85:28::-;;;;;;;;;;;;;:::o",
+  "source": "pragma solidity >=0.4.22 <0.9.0;\n\nimport \"./AnteqToken.sol\";\n\ncontract ANQSwap {\n    AnteqToken public anteqToken;\n\n    constructor(AnteqToken _token) public {\n        anteqToken = _token;\n    }\n\n    // add onlyOwner modifier\n    function setTokenAddress(AnteqToken _token) public returns (bool success) {\n        anteqToken = _token;\n        return true;\n    }\n}\n",
+  "sourcePath": "D:\\programming\\first-simple-dapp\\contracts\\ANQSwap.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/ANQSwap.sol",
+    "exportedSymbols": {
+      "ANQSwap": [
+        29
+      ]
+    },
+    "id": 30,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".22",
+          "<",
+          "0.9",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:32:0"
+      },
+      {
+        "absolutePath": "project:/contracts/AnteqToken.sol",
+        "file": "./AnteqToken.sol",
+        "id": 2,
+        "nodeType": "ImportDirective",
+        "scope": 30,
+        "sourceUnit": 279,
+        "src": "34:26:0",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 29,
+        "linearizedBaseContracts": [
+          29
+        ],
+        "name": "ANQSwap",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 4,
+            "name": "anteqToken",
+            "nodeType": "VariableDeclaration",
+            "scope": 29,
+            "src": "85:28:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_AnteqToken_$278",
+              "typeString": "contract AnteqToken"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 3,
+              "name": "AnteqToken",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 278,
+              "src": "85:10:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_AnteqToken_$278",
+                "typeString": "contract AnteqToken"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 13,
+              "nodeType": "Block",
+              "src": "158:36:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 11,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 9,
+                      "name": "anteqToken",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 4,
+                      "src": "168:10:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_AnteqToken_$278",
+                        "typeString": "contract AnteqToken"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 10,
+                      "name": "_token",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 6,
+                      "src": "181:6:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_AnteqToken_$278",
+                        "typeString": "contract AnteqToken"
+                      }
+                    },
+                    "src": "168:19:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_AnteqToken_$278",
+                      "typeString": "contract AnteqToken"
+                    }
+                  },
+                  "id": 12,
+                  "nodeType": "ExpressionStatement",
+                  "src": "168:19:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 14,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 7,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6,
+                  "name": "_token",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 14,
+                  "src": "132:17:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_AnteqToken_$278",
+                    "typeString": "contract AnteqToken"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 5,
+                    "name": "AnteqToken",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 278,
+                    "src": "132:10:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_AnteqToken_$278",
+                      "typeString": "contract AnteqToken"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "131:19:0"
+            },
+            "returnParameters": {
+              "id": 8,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "158:0:0"
+            },
+            "scope": 29,
+            "src": "120:74:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 27,
+              "nodeType": "Block",
+              "src": "304:57:0",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 23,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 21,
+                      "name": "anteqToken",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 4,
+                      "src": "314:10:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_AnteqToken_$278",
+                        "typeString": "contract AnteqToken"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "id": 22,
+                      "name": "_token",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 16,
+                      "src": "327:6:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_AnteqToken_$278",
+                        "typeString": "contract AnteqToken"
+                      }
+                    },
+                    "src": "314:19:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_AnteqToken_$278",
+                      "typeString": "contract AnteqToken"
+                    }
+                  },
+                  "id": 24,
+                  "nodeType": "ExpressionStatement",
+                  "src": "314:19:0"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "74727565",
+                    "id": 25,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "350:4:0",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 20,
+                  "id": 26,
+                  "nodeType": "Return",
+                  "src": "343:11:0"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 28,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setTokenAddress",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 16,
+                  "name": "_token",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 28,
+                  "src": "255:17:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_AnteqToken_$278",
+                    "typeString": "contract AnteqToken"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 15,
+                    "name": "AnteqToken",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 278,
+                    "src": "255:10:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_AnteqToken_$278",
+                      "typeString": "contract AnteqToken"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "254:19:0"
+            },
+            "returnParameters": {
+              "id": 20,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 19,
+                  "name": "success",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 28,
+                  "src": "290:12:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 18,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "290:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "289:14:0"
+            },
+            "scope": 29,
+            "src": "230:131:0",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 30,
+        "src": "62:301:0"
+      }
+    ],
+    "src": "0:364:0"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "project:/contracts/ANQSwap.sol",
+      "exportedSymbols": {
+        "ANQSwap": [
+          29
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            ">=",
+            "0.4",
+            ".22",
+            "<",
+            "0.9",
+            ".0"
+          ]
+        },
+        "id": 1,
+        "name": "PragmaDirective",
+        "src": "0:32:0"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 279,
+          "absolutePath": "project:/contracts/AnteqToken.sol",
+          "file": "./AnteqToken.sol",
+          "scope": 30,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 2,
+        "name": "ImportDirective",
+        "src": "34:26:0"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            29
+          ],
+          "name": "ANQSwap",
+          "scope": 30
+        },
+        "children": [
+          {
+            "attributes": {
+              "constant": false,
+              "name": "anteqToken",
+              "scope": 29,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "contract AnteqToken",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "AnteqToken",
+                  "referencedDeclaration": 278,
+                  "type": "contract AnteqToken"
+                },
+                "id": 3,
+                "name": "UserDefinedTypeName",
+                "src": "85:10:0"
+              }
+            ],
+            "id": 4,
+            "name": "VariableDeclaration",
+            "src": "85:28:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": true,
+              "kind": "constructor",
+              "modifiers": [
+                null
+              ],
+              "name": "",
+              "scope": 29,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_token",
+                      "scope": 14,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract AnteqToken",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "AnteqToken",
+                          "referencedDeclaration": 278,
+                          "type": "contract AnteqToken"
+                        },
+                        "id": 5,
+                        "name": "UserDefinedTypeName",
+                        "src": "132:10:0"
+                      }
+                    ],
+                    "id": 6,
+                    "name": "VariableDeclaration",
+                    "src": "132:17:0"
+                  }
+                ],
+                "id": 7,
+                "name": "ParameterList",
+                "src": "131:19:0"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 8,
+                "name": "ParameterList",
+                "src": "158:0:0"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "contract AnteqToken"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 4,
+                              "type": "contract AnteqToken",
+                              "value": "anteqToken"
+                            },
+                            "id": 9,
+                            "name": "Identifier",
+                            "src": "168:10:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 6,
+                              "type": "contract AnteqToken",
+                              "value": "_token"
+                            },
+                            "id": 10,
+                            "name": "Identifier",
+                            "src": "181:6:0"
+                          }
+                        ],
+                        "id": 11,
+                        "name": "Assignment",
+                        "src": "168:19:0"
+                      }
+                    ],
+                    "id": 12,
+                    "name": "ExpressionStatement",
+                    "src": "168:19:0"
+                  }
+                ],
+                "id": 13,
+                "name": "Block",
+                "src": "158:36:0"
+              }
+            ],
+            "id": 14,
+            "name": "FunctionDefinition",
+            "src": "120:74:0"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "setTokenAddress",
+              "scope": 29,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_token",
+                      "scope": 28,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract AnteqToken",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "AnteqToken",
+                          "referencedDeclaration": 278,
+                          "type": "contract AnteqToken"
+                        },
+                        "id": 15,
+                        "name": "UserDefinedTypeName",
+                        "src": "255:10:0"
+                      }
+                    ],
+                    "id": 16,
+                    "name": "VariableDeclaration",
+                    "src": "255:17:0"
+                  }
+                ],
+                "id": 17,
+                "name": "ParameterList",
+                "src": "254:19:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "success",
+                      "scope": 28,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 18,
+                        "name": "ElementaryTypeName",
+                        "src": "290:4:0"
+                      }
+                    ],
+                    "id": 19,
+                    "name": "VariableDeclaration",
+                    "src": "290:12:0"
+                  }
+                ],
+                "id": 20,
+                "name": "ParameterList",
+                "src": "289:14:0"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "contract AnteqToken"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 4,
+                              "type": "contract AnteqToken",
+                              "value": "anteqToken"
+                            },
+                            "id": 21,
+                            "name": "Identifier",
+                            "src": "314:10:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 16,
+                              "type": "contract AnteqToken",
+                              "value": "_token"
+                            },
+                            "id": 22,
+                            "name": "Identifier",
+                            "src": "327:6:0"
+                          }
+                        ],
+                        "id": 23,
+                        "name": "Assignment",
+                        "src": "314:19:0"
+                      }
+                    ],
+                    "id": 24,
+                    "name": "ExpressionStatement",
+                    "src": "314:19:0"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 20
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "hexvalue": "74727565",
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "subdenomination": null,
+                          "token": "bool",
+                          "type": "bool",
+                          "value": "true"
+                        },
+                        "id": 25,
+                        "name": "Literal",
+                        "src": "350:4:0"
+                      }
+                    ],
+                    "id": 26,
+                    "name": "Return",
+                    "src": "343:11:0"
+                  }
+                ],
+                "id": 27,
+                "name": "Block",
+                "src": "304:57:0"
+              }
+            ],
+            "id": 28,
+            "name": "FunctionDefinition",
+            "src": "230:131:0"
+          }
+        ],
+        "id": 29,
+        "name": "ContractDefinition",
+        "src": "62:301:0"
+      }
+    ],
+    "id": 30,
+    "name": "SourceUnit",
+    "src": "0:364:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.4",
+  "updatedAt": "2022-01-20T13:59:42.873Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

@@ -24,11 +24,7 @@ contract('AnteqToken', (accounts) => {
 
     it('Should total suply equal to 1mln tokens.', async () => {
       const totalSupply = await anteqToken.totalSupply();
-      assert.equal(
-        web3.utils.fromWei(totalSupply, 'ether'),
-        1000000,
-        'The total suply not equal to 1mln tokens.',
-      );
+      assert.equal(web3.utils.fromWei(totalSupply, 'ether'), 1000000, 'The total suply not equal to 1mln tokens.');
     });
 
     it('Should decimal equal to 18.', async () => {
@@ -39,34 +35,22 @@ contract('AnteqToken', (accounts) => {
     it('Deplyer address should have 1mln tokens', async () => {
       const deployerBalance = await anteqToken.balanceOf(accounts[0]);
 
-      assert.equal(
-        web3.utils.fromWei(deployerBalance, 'ether'),
-        1000000,
-        'Deployer address should have 1mln tokens.',
-      );
+      assert.equal(web3.utils.fromWei(deployerBalance, 'ether'), 1000000, 'Deployer address should have 1mln tokens.');
     });
   });
 
   describe('Transfer tokens by "transfer" function', async () => {
     it('Deployer can send tokens to another address', async () => {
-      const { logs } = await anteqToken.transfer(
-        accounts[1],
-        web3.utils.toWei(web3.utils.toBN(1000), 'ether'),
-        {
-          from: accounts[0],
-        },
-      );
+      const { logs } = await anteqToken.transfer(accounts[1], web3.utils.toWei(web3.utils.toBN(1000), 'ether'), {
+        from: accounts[0],
+      });
 
       assert.equal(logs[0].args._from, accounts[0]);
       assert.equal(logs[0].args._to, accounts[1]);
       assert.equal(web3.utils.fromWei(logs[0].args._value, 'ether'), 1000);
 
       const balanseRecipient = await anteqToken.balanceOf(accounts[1]);
-      assert.equal(
-        web3.utils.fromWei(balanseRecipient, 'ether'),
-        1000,
-        'Recipient balanse is right after transfer',
-      );
+      assert.equal(web3.utils.fromWei(balanseRecipient, 'ether'), 1000, 'Recipient balanse is right after transfer');
     });
     it("Sender doesn't do transfer if havn't enought token", async () => {
       await anteqToken.transfer(accounts[0], web3.utils.toWei(web3.utils.toBN(1001), 'ether'), {
@@ -77,51 +61,36 @@ contract('AnteqToken', (accounts) => {
 
   describe('Transfer tokens by "transferFrom" function', async () => {
     it("Sender can't transfer token from another address if havn't allowance", async () => {
-      await anteqToken.transferFrom(
-        accounts[1],
-        accounts[2],
-        web3.utils.toWei(web3.utils.toBN(1000), 'ether'),
-        {
-          from: accounts[0],
-        },
-      ).should.be.rejected;
+      await anteqToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei(web3.utils.toBN(1000), 'ether'), {
+        from: accounts[0],
+      }).should.be.rejected;
     });
 
     it("Sender can't transfer token from another address if want send to much than allowance approw", async () => {
-      await anteqToken.approve(accounts[0], web3.utils.toWei(web3.utils.toBN(1000), 'ether'), {
+      const { logs } = await anteqToken.approve(accounts[0], web3.utils.toWei(web3.utils.toBN(1000), 'ether'), {
         from: accounts[1],
       });
 
-      await anteqToken.transferFrom(
-        accounts[1],
-        accounts[2],
-        web3.utils.toWei(web3.utils.toBN(1001), 'ether'),
-        {
-          from: accounts[0],
-        },
-      ).should.be.rejected;
+      assert.equal(logs[0].args._owner, accounts[1]);
+      assert.equal(logs[0].args._spender, accounts[0]);
+      assert.equal(web3.utils.fromWei(logs[0].args._value, 'ether'), 1000);
+
+      await anteqToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei(web3.utils.toBN(1001), 'ether'), {
+        from: accounts[0],
+      }).should.be.rejected;
     });
 
     it('Sender can transfer token from another address if have allowance', async () => {
-      const { logs } = await anteqToken.transferFrom(
-        accounts[1],
-        accounts[2],
-        web3.utils.toWei(web3.utils.toBN(1000), 'ether'),
-        {
-          from: accounts[0],
-        },
-      );
+      const { logs } = await anteqToken.transferFrom(accounts[1], accounts[2], web3.utils.toWei(web3.utils.toBN(1000), 'ether'), {
+        from: accounts[0],
+      });
 
       assert.equal(logs[0].args._from, accounts[1]);
       assert.equal(logs[0].args._to, accounts[2]);
       assert.equal(web3.utils.fromWei(logs[0].args._value, 'ether'), 1000);
 
       const balance = await anteqToken.balanceOf(accounts[2]);
-      assert.equal(
-        web3.utils.fromWei(balance),
-        1000,
-        'Tokens can be transfer by another address by allowance',
-      );
+      assert.equal(web3.utils.fromWei(balance), 1000, 'Tokens can be transfer by another address by allowance');
     });
   });
 });
