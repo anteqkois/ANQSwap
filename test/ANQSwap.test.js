@@ -53,9 +53,8 @@ contract('ANQSwap', (accounts) => {
       assert.equal(web3.utils.fromWei(balanceOfSwapEther, 'ether'), 10);
     });
 
-    it("User can't buy token if Swap havn't enought", async () => {
-      await anqSwap.buyTokens({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(1000001), 'ether') }).should.be
-        .rejected;
+    it("User can't buy token if havn't enought ether", async () => {
+      await anqSwap.buyTokens({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(1000), 'ether') }).should.be.rejected;
     });
   });
 
@@ -73,6 +72,10 @@ contract('ANQSwap', (accounts) => {
       assert.equal(web3.utils.fromWei(balanceOfUserANQ, 'ether'), 0);
       assert.equal(web3.utils.fromWei(balanceOfSwapANQ, 'ether'), 1000000);
       assert.equal(web3.utils.fromWei(balanceOfSwapEther, 'ether'), 0);
+    });
+
+    it("User cann't sell token if havn't enought", async () => {
+      await anqSwap.sellTokens(web3.utils.toWei(web3.utils.toBN(100), 'ether'), { from: accounts[0] }).should.be.rejected;
     });
   });
 });

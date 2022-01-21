@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.5.0 <0.9.0;
-// pragma solidity ^0.8.0;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./AnteqToken.sol";
 
-contract ANQSwap is Ownable{
+contract ANQSwap is Ownable {
     AnteqToken public anteqToken;
     uint256 public rate;
     string public name = "AnteqToken Swap";
@@ -18,12 +17,16 @@ contract ANQSwap is Ownable{
     event BuyTokens(address indexed _buyer, uint256 _amount);
     event SellTokens(address indexed _seller, uint256 _amount);
 
-    function setTokenAddress(AnteqToken _token) public onlyOwner returns(bool success) {
+    function setTokenAddress(AnteqToken _token)
+        external
+        onlyOwner
+        returns (bool success)
+    {
         anteqToken = _token;
         return true;
     }
 
-    function buyTokens() public payable {
+    function buyTokens() external payable {
         uint256 amountANQ = msg.value * rate;
         require(
             anteqToken.balanceOf(address(this)) >= amountANQ,
@@ -47,4 +50,9 @@ contract ANQSwap is Ownable{
         payable(msg.sender).transfer(etherToSendBack);
         emit SellTokens(msg.sender, _value);
     }
+
+    // ADD WITHDRAW FUNCION
+    // function withdraw() external onlyOwner returns (bool success){
+    //     payable(owner().address).transfer();
+    // }
 }

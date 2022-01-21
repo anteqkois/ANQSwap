@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.0;
 
 contract AnteqToken {
     string private _name = "AnteqToken";
     string private _symbol = "ANQ";
-    uint256 private _totalSupply = 1000000000000000000000000; // 1 million tokens
     uint8 private _decimals = 18;
+    uint256 private _totalSupply = 1000000 * (10**_decimals); // 1 million tokens
 
     mapping(address => uint256) private _balanceOf;
     mapping(address => mapping(address => uint256)) private _allowance;
