@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ANQSwap from './contracts/ANQSwap.json';
 import AnteqToken from './contracts/AnteqToken.json';
 import Web3 from 'web3';
-import './App.css';
+import StatusBar from './components/StatusBar';
+import Swap from './components/Swap';
 
 export const App = () => {
   const [web3, setWeb3] = useState(null);
@@ -28,7 +29,6 @@ export const App = () => {
     }
   };
 
-  const handleDisconnect = async () => {};
 
   const runExample = async () => {
     const balanceANQInSwap = await ANQContract.methods.balanceOf(ANQSwapContract.options.address).call();
@@ -38,12 +38,10 @@ export const App = () => {
   };
 
   return (
-    <div>
-      <button onClick={handleConnect}>Connect Wallet</button>
-      <button onClick={handleDisconnect}>Disconnect Wallet</button>
-      <button onClick={runExample}>Run Example !</button>
-      <h1 className="text-3xl font-bold underline text-cyan-800">Hello world!!!!!</h1>
-    </div>
+    <>
+      <StatusBar account={accounts} connectWallet={handleConnect}></StatusBar>
+      <Swap accounts={accounts} />
+    </>
   );
 };
 
