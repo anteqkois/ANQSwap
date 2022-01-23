@@ -85,7 +85,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -98,7 +99,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -111,7 +113,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -124,7 +127,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -170,7 +174,8 @@
       "name": "buyTokens",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -12550,12 +12555,13 @@
         }
       },
       "links": {},
-      "address": "0xF422979f73A63d1CAD89fB7dD37dC6138a221096",
-      "transactionHash": "0xc1ec413c1de5f5f6a0284f586dfedb18340b9701ab76a109ec4eab849e859462"
+      "address": "0x27318DC9a2D6a41F613c3b4CD69b8b4E2f349302",
+      "transactionHash": "0xb87288576fa5e2ec98d42f9d49da202012f9b4b24e1b9d44096e1a7c87ca5e39"
     }
   },
   "schemaVersion": "3.4.4",
-  "updatedAt": "2022-01-22T20:27:33.641Z",
+  "updatedAt": "2022-01-23T14:02:50.212Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {
