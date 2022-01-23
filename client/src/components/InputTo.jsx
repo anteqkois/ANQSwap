@@ -9,11 +9,11 @@ const InputTo = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol }) =
           onChange={(event) => patternCheck(event, setCoinAmount)}
           value={coinAmount}
           type="text"
-          inputmode="decimal"
-          autocomplete="off"
-          autocorrect="off"
+          inputMode="decimal"
+          autoComplete="off"
+          autoCorrect="off"
           pattern="^[0-9]*[.,]?[0-9]*$"
-          spellcheck="false"
+          spellCheck="false"
           name="anqAmount"
           id="anqAmount"
           className="p-4 pr-16 text-right w-full h-full bg-transparent focus:outline-none"

@@ -11,6 +11,8 @@
     "precommit": "truffle test",
     "commit": "git add . && git commit -u",
     "postcommit": "git push",
+    "commit-client": "git add . && git commit -u",
+    "postcommit-client": "git push",
     "ganache": "ganache-cli -d first-simple-dapp -i 5777"
   },
   "repository": {

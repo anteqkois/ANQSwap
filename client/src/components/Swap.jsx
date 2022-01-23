@@ -1,12 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from './Button';
 import InputFrom from './InputFrom';
 import InputTo from './InputTo';
 
-const SwapForm = ({ eth, anq }) => {
+const SwapForm = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
   const [ethAmount, setEthAmount] = useState(null);
   const [anqAmount, setAnqAmount] = useState(null);
   const [buy, setBuy] = useState(true);
+  const [eth, setEth] = useState(null);
+  const [anq, setAnq] = useState(null);
+  const [ethPrice, setEthPrice] = useState(null);
+  const [anqPrice, setAnqPrice] = useState(null);
+
+  useEffect(() => {
+    accounts &&
+      (async () => {
+        setEth(web3.utils.fromWei(await web3.eth.getBalance(accounts[0])));
+        setAnq(web3.utils.fromWei(await ANQContract.methods.balanceOf(accounts[0]).call()));
+        setAnqPrice(await ANQSwapContract.methods.rate().call());
+        console.log(await ANQSwapContract.methods.rate().call());
+      })();
+  }, [accounts]);
+
+  useEffect(() => {
+    (async () => {
+      // let data = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+      // data = await data.json();
+      // setEthPrice(data.ethereum.usd);
+      setEthPrice(2443.34);
+    })();
+  }, [web3]);
 
   const handleCheckPattern = (event, set) => {
     const match = event.target.value.match(/^[0-9]*[.,]?[0-9]*$/g);
@@ -15,10 +38,11 @@ const SwapForm = ({ eth, anq }) => {
   };
 
   return (
-    <div className="flex items-center justify-center h-96 w-full backdrop-blur  bg-zinc-900 rounded-xl my-5">
+    <div className="flex items-center justify-center  w-full backdrop-blur  bg-zinc-900 rounded-xl my-5">
       <div className="h-full w-full p-4 text-base">
         <InputFrom
           balance={buy ? eth : anq}
+          rate={buy ? ethPrice : 100}
           symbol={buy ? 'ETH' : 'ANQ'}
           patternCheck={handleCheckPattern}
           coinAmount={buy ? ethAmount : anqAmount}
@@ -38,7 +62,8 @@ const SwapForm = ({ eth, anq }) => {
           coinAmount={buy ? anqAmount : ethAmount}
           setCoinAmount={buy ? setAnqAmount : setEthAmount}
         ></InputTo>
-        <div className="flex justify-center flex-col py-6">
+        <p className="p-1">1 ETH = 728 ANQ = ${ethPrice}</p>
+        <div className="flex justify-center flex-col py-2">
           <Button onClick={() => setBuy(true)}>Buy</Button>
           <Button onClick={() => setBuy(false)} type="ghost">
             Sell
