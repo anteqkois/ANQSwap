@@ -33,7 +33,7 @@ export const App = () => {
   return (
     <div className="w-screen p-4 flex flex-col h-screen bg-zinc-800 text-slate-300">
       <StatusBar account={accounts} connectWallet={handleConnect}></StatusBar>
-      <div className=" flex items-center justify-center">
+      <div className=" flex items-center justify-center md:h-3/4">
         <Swap web3={web3} accounts={accounts} ANQSwapContract={ANQSwapContract} ANQContract={ANQContract} />
       </div>
     </div>

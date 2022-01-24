@@ -4,14 +4,11 @@ import Button from './Button';
 const StatusBar = ({ account, connectWallet }) => {
   return (
     <div className="flex items-center justify-between gap-y-4 flex-col p-4 lg:flex-row ">
-      <div className="text-center">
-        Wallet address: <strong className="text-sm block"> {account ? account : '...'}</strong>
+      <div className="text-center flex flex-col items-center gap-1 sm:flex-row">
+        <p>Wallet address:</p>
+        <strong className="text-sm"> {account ? account : '0x___'}</strong>
       </div>
-      <Button
-      onClick={!account && connectWallet}
-      >
-        {account ? 'Wallet was connected' : 'Connect wallet'}
-      </Button>
+      <Button onClick={!account && connectWallet}>{account ? 'Wallet was connected' : 'Connect wallet'}</Button>
     </div>
   );
 };
