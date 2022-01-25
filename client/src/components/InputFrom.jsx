@@ -1,6 +1,6 @@
 import React from 'react';
 
-const InputFrom = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol, valueOfAmount }) => {
+const InputFrom = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol, valueOfAmount, web3 }) => {
   // const handleCheckPattern = (event, setCoinAmount) => patternCheck(event, setCoinAmount);
 
   return (
@@ -18,8 +18,13 @@ const InputFrom = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol, v
           spellCheck="false"
           name="ethAmount"
           id="ethAmount"
-          className="p-4 pr-16 pb-8 text-right w-full h-full bg-transparent focus:outline-none"
           placeholder="0"
+          className=" p-4 pr-16 pb-8 text-right w-full h-full bg-transparent focus:outline-none"
+          // className={`tooltip p-4 pr-16 pb-8 text-right w-full h-full bg-transparent focus:outline-none ${
+          //   !web3 && 'cursor-not-allowed'
+          // }`}
+          // disabled={!web3}
+          // title={!web3 && 'Connect your wallet'}
         />
         <span className="absolute right-4 pt-2">{symbol}</span>
         <p className="p-0.5 px-4 text-right text-sm text-slate-400 absolute bottom-1 right-1">

@@ -1,8 +1,9 @@
 import React from 'react';
 
-const Button = ({ children, onClick, className, type }) => {
+const Button = ({ children, onClick, className, type, ...props }) => {
   return (
     <button
+    {...props}
       className={
         type === 'ghost'
           ? `${className} rounded-md uppercase font-semibold m-1 mx-2 py-1 outline outline-zinc-800 outline-4 hover:text-slate-100 hover:outline-zinc-700`

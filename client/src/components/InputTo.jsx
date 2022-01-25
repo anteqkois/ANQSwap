@@ -1,6 +1,6 @@
 import React from 'react';
 
-const InputTo = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol }) => {
+const InputTo = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol, web3 }) => {
   return (
     <>
       <p className="pb-0.5 px-4 text-right text-sm text-slate-400">Your balance: {balance ? balance : 0}</p>
@@ -16,8 +16,13 @@ const InputTo = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol }) =
           spellCheck="false"
           name="anqAmount"
           id="anqAmount"
-          className="p-4 pr-16 text-right w-full h-full bg-transparent focus:outline-none"
           placeholder="0"
+          className="p-4 pr-16 text-right w-full h-full bg-transparent focus:outline-none"
+          // className={`tooltip p-4 pr-16 text-right w-full h-full bg-transparent focus:outline-none ${
+          //   !web3 && 'cursor-not-allowed'
+          // }`}
+          // disabled={!web3}
+          // title={!web3 && 'Connect your wallet'}
         />
         <span className="absolute right-4 top-1/2 -translate-y-1/2">{symbol}</span>
       </div>
