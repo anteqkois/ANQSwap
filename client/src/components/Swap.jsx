@@ -24,8 +24,8 @@ const reducer = (state, action) => {
       return { ...state, from: { ...state.from, priceUSD: action.payload } };
       break;
     case ACTION.FROM_SET_AMOUNT:
-      console.log( action.payload);
-      console.log(typeof action.payload);
+      // console.log( action.payload);
+      // console.log(typeof action.payload);
       // action.payload = typeof action.payload[0] === null ? '' : action.payload[0];
       // console.log( action.payload);
 
@@ -131,12 +131,26 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
       });
     })();
   }, [web3]);
+  console.log(ANQSwapContract);
 
   const handleSwap = useCallback(async () => {
     web3 &&
       (async () => {
-        console.log(state.from.amount, state.to.amount);
-        console.log(state.from.symbol === 'ETH' ? 'buy' : 'sell');
+        // console.log(state.from.amount, state.to.amount);
+        state.from.symbol === 'ETH'
+          ? (() => {
+              // console.log('buy', web3.utils.toWei(state.from.amount));
+              ANQSwapContract.methods
+                .buyTokens()
+                .send({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(state.from.amount)) });
+            })()
+          : (() => {
+              // console.log('sell', web3.utils.toWei(state.from.amount));
+              ANQContract.methods.approve(ANQSwapContract.options.address).call({ from: accounts[0] });
+              ANQSwapContract.methods
+                .sellTokens(web3.utils.toWei(web3.utils.toBN(state.from.amount)))
+                .call({ from: accounts[0] });
+            })();
       })();
   }, [web3, state.from.symbol, state.from.amount, state.to.amount]);
 
