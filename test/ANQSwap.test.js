@@ -28,11 +28,11 @@ contract('ANQSwap', (accounts) => {
   });
 
   describe('Initial liquidity, ANQ and ETH amount', async () => {
-    it('Right amount of totalLiquidity', async () => {
-      const totalLiquidity = await anqSwap.totalLiquidity();
+    it('Right amount of totalLiquidityFormula', async () => {
+      const totalLiquidityFormula = await anqSwap.totalLiquidityFormula();
 
-      // totalLiquidity = x**10*18 * y**10*18 ==>  totalLiquidity*10*19
-      assert.equal(web3.utils.fromWei(web3.utils.fromWei(totalLiquidity, 'ether'), 'ether'), 5_000_000);
+      // totalLiquidityFormula = x**10*18 * y**10*18 ==>  totalLiquidityFormula*10*19
+      assert.equal(web3.utils.fromWei(web3.utils.fromWei(totalLiquidityFormula, 'ether'), 'ether'), 5_000_000);
     });
     it('Right amount of ANQ', async () => {
       const balanceOfSwap = await anteqToken.balanceOf(anqSwap.address);
@@ -57,23 +57,33 @@ contract('ANQSwap', (accounts) => {
     });
   });
 
-  xdescribe('Buy token', async () => {
-    it('User can buy token', async () => {
-      const { logs } = await anqSwap.buyTokens({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(10), 'ether') });
+  describe('Buy token', async () => {
+    it('User can buy ANQ', async () => {
+      const predirectAmountOfBuyTokens = await anqSwap.predirectAmountOfBuyTokens(web3.utils.toWei(web3.utils.toBN(5), 'ether'));
+      // console.log('predirectAmountOfBuyTokens', web3.utils.fromWei(predirectAmountOfBuyTokens));
 
-      const balanceOfUserANQ = await anteqToken.balanceOf(accounts[0]);
-      const balanceOfSwapANQ = await anteqToken.balanceOf(anqSwap.address);
-      const balanceOfSwapEther = await web3.eth.getBalance(anqSwap.address);
+      const { logs } = await anqSwap.buyTokens({ from: accounts[1], value: web3.utils.toWei(web3.utils.toBN(5), 'ether') });
 
-      assert.equal(logs[0].args._buyer, accounts[0]);
-      assert.equal(web3.utils.fromWei(logs[0].args._amount, 'ether'), 100);
-      assert.equal(web3.utils.fromWei(balanceOfUserANQ, 'ether'), 100);
-      assert.equal(web3.utils.fromWei(balanceOfSwapANQ, 'ether'), 999900);
-      assert.equal(web3.utils.fromWei(balanceOfSwapEther, 'ether'), 10);
+      // for (const log of logs) {
+      //   console.log(log.args._info, web3.utils.fromWei(log.args._number, 'wei'));
+      // }
+
+      const buyerBalanceOfANQ = await anteqToken.balanceOf(accounts[1]);
+      const swapBalanceOfANQ = await anteqToken.balanceOf(anqSwap.address);
+      const swapBalanceOfETH = await web3.eth.getBalance(anqSwap.address);
+
+      assert.equal(logs[0].args._buyer, accounts[1]);
+      assert.equal(web3.utils.fromWei(logs[0].args._amount), web3.utils.fromWei(predirectAmountOfBuyTokens));
+
+
+      //potem odkomentować 
+      assert.equal(web3.utils.fromWei(buyerBalanceOfANQ), web3.utils.fromWei(predirectAmountOfBuyTokens));
+      assert.equal(web3.utils.fromWei(swapBalanceOfANQ), 100_000 - web3.utils.fromWei(predirectAmountOfBuyTokens));
+      assert.equal(web3.utils.fromWei(swapBalanceOfETH), 55);
     });
 
     it("User can't buy token if havn't enought ether", async () => {
-      await anqSwap.buyTokens({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(1000), 'ether') }).should.be.rejected;
+      await anqSwap.buyTokens({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(1000)) }).should.be.rejected;
     });
   });
 
