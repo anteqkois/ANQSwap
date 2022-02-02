@@ -16,8 +16,8 @@ contract ANQSwap is Ownable {
 		anteqToken = _token;
 	}
 
-	event BuyTokens(address indexed _buyer, uint256 _amount);
-	event SellTokens(address indexed _seller, uint256 _amount);
+	event BuyTokens(address indexed _buyer, uint256 _amountANQ, uint256 _amountETH);
+	event SellTokens(address indexed _seller, uint256 _amountANQ,  uint256 _amountETH);
 	event debugN(string _info, uint256 _number);
 
 	function addInitialLiquidity(uint256 _tokenAmount) external payable {
@@ -31,12 +31,13 @@ contract ANQSwap is Ownable {
 		return true;
 	}
 
-	function predirectAmountOfBuyTokens(uint256 _ETHAmount) public view returns (uint256 predirectANQAmount) {
-		uint256 amountANQToTransfer = _getAmountOut(_ETHAmount, address(this).balance, anteqToken.balanceOf(address(this)));
-		// uint256 amountANQToTransfer = (anteqToken.balanceOf(address(this)) *
-		//     _ETHAmount) / (address(this).balance + _ETHAmount);
-		require(anteqToken.balanceOf(address(this)) >= amountANQToTransfer, "AnteqToken Swap havn't enought ANQ.");
-		return amountANQToTransfer;
+	function predirectExactAmountOut(uint256 _amountIn, bool _buy) public view returns (uint256 amountToTransfer) {
+		uint256 reserveIn = (_buy ? address(this).balance : anteqToken.balanceOf(address(this)));
+		uint256 reserveOut = (_buy ? anteqToken.balanceOf(address(this)) : address(this).balance);
+		amountToTransfer = _getAmountOut(_amountIn, reserveIn, reserveOut);
+		// uint256 amountToTransfer = (anteqToken.balanceOf(address(this)) *
+		//     _amountIn) / (address(this).balance + _amountIn);
+		require(reserveOut >= amountToTransfer, "AnteqToken Swap havn't enought token to send back.");
 	}
 
 	function _getAmountOut(
@@ -67,16 +68,20 @@ contract ANQSwap is Ownable {
 			amountANQInSwapAfterTransfer.mul(address(this).balance) >= totalLiquidityFormula,
 			"Invalid final tokens amount."
 		);
-		totalLiquidityFormula = amountANQInSwapAfterTransfer.mul(address(this).balance);
 
 		anteqToken.transfer(msg.sender, amountANQToTransfer);
-		emit BuyTokens(msg.sender, amountANQToTransfer);
+
+		totalLiquidityFormula = amountANQInSwapAfterTransfer.mul(address(this).balance);
+		emit BuyTokens(msg.sender, amountANQToTransfer, msg.value);
 	}
 
 	function sellTokens(uint256 _value) external {
 		require(anteqToken.balanceOf(msg.sender) >= _value, "You havn't enought ANQ tokens.");
 		uint256 amountETHToTransfer = _getAmountOut(_value, anteqToken.balanceOf(address(this)), address(this).balance);
-		require(address(this).balance >= amountETHToTransfer, "Swap doesn't have enought Ether to buy yours ANQ tokens.");
+		require(
+			address(this).balance >= amountETHToTransfer,
+			"Swap doesn't have enought Ether to buy yours ANQ tokens."
+		);
 
 		uint256 amountANQInSwapAfterTransfer = anteqToken.balanceOf(address(this)).add(_value);
 
@@ -85,33 +90,12 @@ contract ANQSwap is Ownable {
 			"Invalid final tokens amount."
 		);
 
-		emit SellTokens(msg.sender, _value);
-		emit debugN("new K", amountANQInSwapAfterTransfer.mul(address(this).balance - amountETHToTransfer));
-
 		anteqToken.transferFrom(msg.sender, address(this), _value);
 		payable(msg.sender).transfer(amountETHToTransfer);
 
-		//TODO set new K
-		emit debugN("amountETHToTransfer", amountETHToTransfer);
-		emit debugN("amountANQInSwapAfterTransfer", amountANQInSwapAfterTransfer);
-		emit debugN("old K", totalLiquidityFormula);
-		emit debugN("ETH i nSwao after", address(this).balance);
+		totalLiquidityFormula = amountANQInSwapAfterTransfer.mul(address(this).balance - amountETHToTransfer);
+		emit SellTokens(msg.sender, _value, amountETHToTransfer);
 	}
-
-	// function sellTokens(uint256 _value) public {
-	//     require(
-	//         anteqToken.balanceOf(msg.sender) >= _value,
-	//         "You doesn't have enought AnteqToken."
-	//     );
-	//     uint256 etherToSendBack = _value / rate;
-	//     require(
-	//         address(this).balance >= etherToSendBack,
-	//         "AnteqToken Swap doesn't have enought Ether to buy yours token."
-	//     );
-	//     anteqToken.transferFrom(msg.sender, address(this), _value);
-	//     payable(msg.sender).transfer(etherToSendBack);
-	//     emit SellTokens(msg.sender, _value);
-	// }
 
 	// ADD WITHDRAW FUNCION
 	// function withdraw() external onlyOwner returns (bool success){
