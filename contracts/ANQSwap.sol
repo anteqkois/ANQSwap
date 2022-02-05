@@ -139,9 +139,20 @@ contract ANQSwap is Ownable {
 		return true;
 	}
 
-	// 	payable(msg.sender).transfer(amountETHToTransfer);
+	function swapTokensforExactETH(uint256 _amountOut) external returns (bool success) {
+		(uint256 reserve0, uint256 reserve1) = _getReserve();
 
-	// 	liquidityFormula = amountANQInSwapAfterTransfer.mul(address(this).balance - amountETHToTransfer);
-	// 	emit SellTokens(msg.sender, _value, amountETHToTransfer);
-	// }
+		uint256 amountANQIn = _getAmountIn(_amountOut, reserve1, reserve0);
+
+		require((amountANQIn <= reserve1) && (_amountOut <= reserve0), "Not enought tokens in swap");
+
+		uint256 newLiquidityFormula = reserve0.sub(_amountOut).mul(reserve1.add(amountANQIn));
+		require(newLiquidityFormula >= liquidityFormula, "Invalid final tokens amount");
+
+		anteqToken.transferFrom(msg.sender, address(this), amountANQIn);
+		_swap(_amountOut, uint256(0), msg.sender);
+		liquidityFormula = newLiquidityFormula;
+		emit SellTokens(msg.sender, _amountOut, amountANQIn);
+		return true;
+	}
 }

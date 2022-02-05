@@ -107,30 +107,30 @@ contract('ANQSwap', (accounts) => {
       assert.equal(fromWei(swapBalanceOfETHAfter), fromWei(web3.utils.toBN(swapBalanceOfETHBefore).add(predirectExactIn)));
     });
 
-    it("User can't buy token if havn't enought ETH", async () => {
+    it("User can't buy token if doesn't have enought ETH", async () => {
       await anqSwap.swapExactETHForTokens({ from: accounts[0], value: toWei(1_000) }).should.be.rejected;
     });
   });
 
   describe('Sell token', async () => {
-    it('User can sell ANQ', async () => {
-      const sellerBalanceOfANQBefore = await anteqToken.balanceOf(accounts[1]);
+    it('User can sell exact ANQ amount', async () => {
+      const sellerBalanceOfANQBefore = await anteqToken.balanceOf(accounts[3]);
       const swapBalanceOfANQBefore = await anteqToken.balanceOf(anqSwap.address);
-      const sellerBalanceOfETHBefore = await web3.eth.getBalance(accounts[1]);
+      const sellerBalanceOfETHBefore = await web3.eth.getBalance(accounts[3]);
       const swapBalanceOfETHBefore = await web3.eth.getBalance(anqSwap.address);
       const predirectExactOut = await anqSwap.predirectExactOut(0, sellerBalanceOfANQBefore);
 
       await anteqToken.approve(anqSwap.address, sellerBalanceOfANQBefore, {
-        from: accounts[1],
+        from: accounts[3],
       });
-      const { logs } = await anqSwap.swapExactTokensforETH(sellerBalanceOfANQBefore, { from: accounts[1] });
+      const { logs } = await anqSwap.swapExactTokensforETH(sellerBalanceOfANQBefore, { from: accounts[3] });
 
-      const sellerBalanceOfANQAfter = await anteqToken.balanceOf(accounts[1]);
+      const sellerBalanceOfANQAfter = await anteqToken.balanceOf(accounts[3]);
       const swapBalanceOfANQAfter = await anteqToken.balanceOf(anqSwap.address);
-      const sellerBalanceOfETHAfter = await web3.eth.getBalance(accounts[1]);
+      const sellerBalanceOfETHAfter = await web3.eth.getBalance(accounts[3]);
       const swapBalanceOfETHAfter = await web3.eth.getBalance(anqSwap.address);
 
-      assert.equal(logs[0].args._seller, accounts[1]);
+      assert.equal(logs[0].args._seller, accounts[3]);
       assert.equal(fromWei(logs[0].args._amountANQ), fromWei(sellerBalanceOfANQBefore));
       assert.equal(fromWei(logs[0].args._amountETH), fromWei(predirectExactOut));
       assert.equal(fromWei(sellerBalanceOfANQAfter), 0);
@@ -139,13 +139,47 @@ contract('ANQSwap', (accounts) => {
       assert.isAbove(parseFloat(fromWei(sellerBalanceOfETHAfter)), parseFloat(fromWei(sellerBalanceOfETHBefore)));
     });
 
-    it("User cann't sell token if havn't enought", async () => {
+    it('User can sell ANQ for exact ETH amount', async () => {
+      const sellerBalanceOfANQBefore = await anteqToken.balanceOf(accounts[1]);
+      const swapBalanceOfANQBefore = await anteqToken.balanceOf(anqSwap.address);
+      const sellerBalanceOfETHBefore = await web3.eth.getBalance(accounts[1]);
+      const swapBalanceOfETHBefore = await web3.eth.getBalance(anqSwap.address);
+      const predirectExactIn = await anqSwap.predirectExactIn(toWei(4), 0);
 
+      await anteqToken.approve(anqSwap.address, predirectExactIn, {
+        from: accounts[1],
+      });
+      const { logs } = await anqSwap.swapTokensforExactETH(toWei(4), { from: accounts[1] });
+
+      const sellerBalanceOfANQAfter = await anteqToken.balanceOf(accounts[1]);
+      const swapBalanceOfANQAfter = await anteqToken.balanceOf(anqSwap.address);
+      const sellerBalanceOfETHAfter = await web3.eth.getBalance(accounts[1]);
+      const swapBalanceOfETHAfter = await web3.eth.getBalance(anqSwap.address);
+
+      assert.equal(logs[0].args._seller, accounts[1]);
+      assert.equal(fromWei(logs[0].args._amountANQ), fromWei(predirectExactIn));
+      assert.equal(fromWei(logs[0].args._amountETH), 4);
+      assert.equal(fromWei(sellerBalanceOfANQAfter), fromWei(sellerBalanceOfANQBefore.sub(predirectExactIn)));
+      assert.equal(fromWei(swapBalanceOfANQAfter), fromWei(swapBalanceOfANQBefore.add(predirectExactIn)));
+      assert.equal(fromWei(swapBalanceOfETHAfter), fromWei(web3.utils.toBN(swapBalanceOfETHBefore).sub(toWei(4))));
+      assert.isAbove(parseFloat(fromWei(sellerBalanceOfETHAfter)), parseFloat(fromWei(sellerBalanceOfETHBefore)));
+    });
+
+    it("User can't sell token if doesn't have enought ANQ", async () => {
       await anteqToken.approve(anqSwap.address, toWei(1000), {
         from: accounts[4],
       });
 
       await anqSwap.swapExactTokensforETH(toWei(1000), { from: accounts[4] }).should.be.rejected;
+    });
+
+    it("User can't sell token if want enought ETH and doesn't have enought ANQ", async () => {
+      const predirectExactIn = await anqSwap.predirectExactIn(toWei(10), 0);
+
+      await anteqToken.approve(anqSwap.address, predirectExactIn, {
+        from: accounts[1],
+      });
+      const { logs } = await anqSwap.swapTokensforExactETH(toWei(10), { from: accounts[1] }).should.be.rejected;
     });
   });
 });
