@@ -5,6 +5,9 @@ const ANQSwap = artifacts.require('./ANQSwap.sol');
 
 require('chai').use(require('chai-as-promised')).should();
 
+// for (const log of logs) {
+//   console.log(log.args._info, web3.utils.fromWei(log.args._number, 'wei'));
+// }
 const fromWei = (wei) => web3.utils.fromWei(wei);
 const toWei = (wei) => web3.utils.toWei(web3.utils.toBN(wei));
 
@@ -61,14 +64,10 @@ contract('ANQSwap', (accounts) => {
   });
 
   describe('Buy token', async () => {
-    it('User can buy ANQ', async () => {
+    it('User can buy ANQ by exact ETH amount', async () => {
       const predirectExactOut = await anqSwap.predirectExactOut(toWei(5), 0);
 
       const { logs } = await anqSwap.swapExactETHForTokens({ from: accounts[1], value: toWei(5) });
-
-      // for (const log of logs) {
-      //   console.log(log.args._info, web3.utils.fromWei(log.args._number, 'wei'));
-      // }
 
       const buyerBalanceOfANQ = await anteqToken.balanceOf(accounts[1]);
       const swapBalanceOfANQ = await anteqToken.balanceOf(anqSwap.address);
@@ -83,36 +82,70 @@ contract('ANQSwap', (accounts) => {
       assert.equal(fromWei(swapBalanceOfETH), 55);
     });
 
-    it("User can't buy token if havn't enought ether", async () => {
-      await anqSwap.swapExactETHForTokens({ from: accounts[0], value: toWei(1_000) }).should.be
-        .rejected;
+    it('User can buy exact ANQ amount', async () => {
+      // Want 1000 ANQ, calculate amount ETH to send
+      const predirectExactIn = await anqSwap.predirectExactIn(0, toWei(1_000));
+
+      // To check if contract calculate right ETH in amount
+      const predirectExactOut = await anqSwap.predirectExactOut(predirectExactIn, 0);
+
+      const swapBalanceOfANQBefore = await anteqToken.balanceOf(anqSwap.address);
+      const swapBalanceOfETHBefore = await web3.eth.getBalance(anqSwap.address);
+
+      const { logs } = await anqSwap.swapExactETHForTokens({ from: accounts[3], value: predirectExactIn });
+
+      const buyerBalanceOfANQ = await anteqToken.balanceOf(accounts[3]);
+      const swapBalanceOfANQAfter = await anteqToken.balanceOf(anqSwap.address);
+      const swapBalanceOfETHAfter = await web3.eth.getBalance(anqSwap.address);
+
+      assert.equal(logs[0].args._buyer, accounts[3]);
+      assert.equal(fromWei(logs[0].args._amountANQ), 1_000);
+      assert.equal(fromWei(logs[0].args._amountETH), fromWei(predirectExactIn));
+
+      assert.equal(fromWei(buyerBalanceOfANQ), fromWei(predirectExactOut));
+      assert.equal(fromWei(swapBalanceOfANQAfter), fromWei(web3.utils.toBN(swapBalanceOfANQBefore).sub(predirectExactOut)));
+      assert.equal(fromWei(swapBalanceOfETHAfter), fromWei(web3.utils.toBN(swapBalanceOfETHBefore).add(predirectExactIn)));
+    });
+
+    it("User can't buy token if havn't enought ETH", async () => {
+      await anqSwap.swapExactETHForTokens({ from: accounts[0], value: toWei(1_000) }).should.be.rejected;
     });
   });
 
-  xdescribe('Sell token', async () => {
+  describe('Sell token', async () => {
     it('User can sell ANQ', async () => {
-      const balanceOfANQSeller = await anteqToken.balanceOf(accounts[1]);
-      const predirectExactOut = await anqSwap.predirectExactOut(balanceOfANQSeller, false);
+      const sellerBalanceOfANQBefore = await anteqToken.balanceOf(accounts[1]);
+      const swapBalanceOfANQBefore = await anteqToken.balanceOf(anqSwap.address);
+      const sellerBalanceOfETHBefore = await web3.eth.getBalance(accounts[1]);
+      const swapBalanceOfETHBefore = await web3.eth.getBalance(anqSwap.address);
+      const predirectExactOut = await anqSwap.predirectExactOut(0, sellerBalanceOfANQBefore);
 
-      await anteqToken.approve(anqSwap.address, balanceOfANQSeller, {
+      await anteqToken.approve(anqSwap.address, sellerBalanceOfANQBefore, {
         from: accounts[1],
       });
-      const { logs } = await anqSwap.sellTokens(balanceOfANQSeller, { from: accounts[1] });
+      const { logs } = await anqSwap.swapExactTokensforETH(sellerBalanceOfANQBefore, { from: accounts[1] });
 
-      const balanceOfUserANQ = await anteqToken.balanceOf(accounts[1]);
-      const balanceOfSwapANQ = await anteqToken.balanceOf(anqSwap.address);
-      const balanceOfSwapEther = await web3.eth.getBalance(anqSwap.address);
+      const sellerBalanceOfANQAfter = await anteqToken.balanceOf(accounts[1]);
+      const swapBalanceOfANQAfter = await anteqToken.balanceOf(anqSwap.address);
+      const sellerBalanceOfETHAfter = await web3.eth.getBalance(accounts[1]);
+      const swapBalanceOfETHAfter = await web3.eth.getBalance(anqSwap.address);
 
       assert.equal(logs[0].args._seller, accounts[1]);
-      assert.equal(web3.utils.fromWei(logs[0].args._amountANQ, 'ether'), web3.utils.fromWei(balanceOfANQSeller));
-      assert.equal(web3.utils.fromWei(logs[0].args._amountETH, 'ether'), fromWei(predirectExactOut));
-      assert.equal(web3.utils.fromWei(balanceOfUserANQ, 'ether'), 0);
-      assert.equal(web3.utils.fromWei(balanceOfSwapANQ, 'ether'), 100_000);
-      assert.equal(web3.utils.fromWei(balanceOfSwapEther, 'ether'), 55 - web3.utils.fromWei(predirectExactOut, 'ether'));
+      assert.equal(fromWei(logs[0].args._amountANQ), fromWei(sellerBalanceOfANQBefore));
+      assert.equal(fromWei(logs[0].args._amountETH), fromWei(predirectExactOut));
+      assert.equal(fromWei(sellerBalanceOfANQAfter), 0);
+      assert.equal(fromWei(swapBalanceOfANQAfter), fromWei(swapBalanceOfANQBefore.add(sellerBalanceOfANQBefore)));
+      assert.equal(fromWei(swapBalanceOfETHAfter), fromWei(web3.utils.toBN(swapBalanceOfETHBefore).sub(predirectExactOut)));
+      assert.isAbove(parseFloat(fromWei(sellerBalanceOfETHAfter)), parseFloat(fromWei(sellerBalanceOfETHBefore)));
     });
 
     it("User cann't sell token if havn't enought", async () => {
-      await anqSwap.sellTokens(web3.utils.toWei(web3.utils.toBN(100), 'ether'), { from: accounts[0] }).should.be.rejected;
+
+      await anteqToken.approve(anqSwap.address, toWei(1000), {
+        from: accounts[4],
+      });
+
+      await anqSwap.swapExactTokensforETH(toWei(1000), { from: accounts[4] }).should.be.rejected;
     });
   });
 });
