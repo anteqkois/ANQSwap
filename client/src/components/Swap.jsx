@@ -1,70 +1,59 @@
-import React, { useState, useEffect, useReducer, useCallback } from 'react';
-import Button from './Button';
-import InputFrom from './InputFrom';
-import InputTo from './InputTo';
+import React, { useState, useEffect, useReducer, useCallback } from "react";
+import useDebounce from "../hooks/useDebounce";
+import handleInputOutputPattern from "../helpers/handleInputOutputPattern";
+import Button from "./Button";
+import InputFrom from "./InputFrom";
+import InputTo from "./InputTo";
 
 const ACTION = {
-  FROM_SET_BALANCE: 'FROM_SET_BALANCE',
-  FROM_SET_PRICE_USD: 'FROM_SET_PRICE_USD',
-  FROM_SET_AMOUNT: 'FROM_SET_AMOUNT',
-  FROM_SET_SYMBOL: 'FROM_SET_SYMBOL',
-  TO_SET_BALANCE: 'TO_SET_BALANCE',
-  TO_SET_PRICE_USD: 'TO_SET_PRICE_USD',
-  TO_SET_AMOUNT: 'TO_SET_AMOUNT',
-  TO_SET_SYMBOL: 'TO_SET_SYMBOL',
-  REVERT: 'REVERT',
+  INPUT_SET_BALANCE: "INPUT_SET_BALANCE",
+  INPUT_SET_PRICE_USD: "INPUT_SET_PRICE_USD",
+  INPUT_SET_AMOUNT: "INPUT_SET_AMOUNT",
+  INPUT_SET_SYMBOL: "INPUT_SET_SYMBOL",
+  OUTPUT_SET_BALANCE: "OUTPUT_SET_BALANCE",
+  OUTPUT_SET_PRICE_USD: "OUTPUT_SET_PRICE_USD",
+  OUTPUT_SET_AMOUNT: "OUTPUT_SET_AMOUNT",
+  OUTPUT_SET_SYMBOL: "OUTPUT_SET_SYMBOL",
+  REVERT: "REVERT",
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case ACTION.FROM_SET_BALANCE:
-      return { ...state, from: { ...state.from, balance: action.payload } };
+    case ACTION.INPUT_SET_BALANCE:
+      return { ...state, input: { ...state.input, balance: action.payload } };
       break;
-    case ACTION.FROM_SET_PRICE_USD:
-      return { ...state, from: { ...state.from, priceUSD: action.payload } };
+    case ACTION.INPUT_SET_PRICE_USD:
+      return { ...state, input: { ...state.input, priceUSD: action.payload } };
       break;
-    case ACTION.FROM_SET_AMOUNT:
-      // console.log( action.payload);
-      // console.log(typeof action.payload);
-      // action.payload = typeof action.payload[0] === null ? '' : action.payload[0];
-      // console.log( action.payload);
-
-      const toAmount =
-        state.to.priceUSD === 0 || state.from.priceUSD === 0
-          ? 'Connect wallet'
-          : (action.payload * state.from.priceUSD) / state.to.priceUSD;
+    case ACTION.INPUT_SET_AMOUNT:
       return {
-        from: { ...state.from, amount: action.payload[0] },
-        to: { ...state.to, amount: action.payload[0] === '' ? '' : toAmount },
+        ...state,
+        input: { ...state.input, amount: action.payload },
       };
       break;
-    case ACTION.FROM_SET_SYMBOL:
-      return { ...state, from: { ...state.from, symbol: action.payload } };
+    case ACTION.INPUT_SET_SYMBOL:
+      return { ...state, input: { ...state.input, symbol: action.payload } };
       break;
-    case ACTION.TO_SET_BALANCE:
-      return { ...state, to: { ...state.to, balance: action.payload } };
+    case ACTION.OUTPUT_SET_BALANCE:
+      return { ...state, output: { ...state.output, balance: action.payload } };
       break;
-    case ACTION.TO_SET_PRICE_USD:
-      return { ...state, to: { ...state.to, priceUSD: action.payload } };
-      break;
-    case ACTION.TO_SET_AMOUNT:
-      const fromAmount =
-        state.to.priceUSD === 0 || state.from.priceUSD === 0
-          ? 'Connect wallet'
-          : (action.payload * state.from.priceUSD) / state.to.priceUSD;
+    case ACTION.OUTPUT_SET_PRICE_USD:
       return {
-        to: { ...state.to, amount: action.payload[0] },
-        from: {
-          ...state.from,
-          amount: action.payload[0] === '' ? '' : fromAmount,
-        },
+        ...state,
+        output: { ...state.output, priceUSD: action.payload },
       };
       break;
-    case ACTION.TO_SET_SYMBOL:
-      return { ...state, to: { ...state.to, symbol: action.payload } };
+    case ACTION.OUTPUT_SET_AMOUNT:
+      return {
+        ...state,
+        output: { ...state.output, amount: action.payload },
+      };
+      break;
+    case ACTION.OUTPUT_SET_SYMBOL:
+      return { ...state, output: { ...state.output, symbol: action.payload } };
       break;
     case ACTION.REVERT:
-      return { from: state.to, to: state.from };
+      return { input: state.output, output: state.input };
       break;
 
     default:
@@ -74,22 +63,22 @@ const reducer = (state, action) => {
 };
 
 const initialState = {
-  from: {
+  input: {
     balance: 0,
     priceUSD: 0,
-    amount: '',
-    symbol: 'ETH',
+    amount: "",
+    symbol: "ETH",
   },
-  to: {
+  output: {
     balance: 0,
     priceUSD: 0,
-    amount: '',
-    symbol: 'ANQ',
+    amount: "",
+    symbol: "ANQ",
   },
 };
 
 const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
-  const [isBuying, setIsBuying] = useState(true);
+  // const [isBuying, setIsBuying] = useState(true);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -97,24 +86,27 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
     accounts &&
       (async () => {
         dispatch({
-          type: ACTION.FROM_SET_BALANCE,
+          type: ACTION.INPUT_SET_BALANCE,
           payload: web3.utils.fromWei(await web3.eth.getBalance(accounts[0])),
         });
         dispatch({
-          type: ACTION.TO_SET_BALANCE,
-          payload: web3.utils.fromWei(await ANQContract.methods.balanceOf(accounts[0]).call()),
+          type: ACTION.OUTPUT_SET_BALANCE,
+          payload: web3.utils.fromWei(
+            await ANQContract.methods.balanceOf(accounts[0]).call()
+          ),
         });
         dispatch({
-          type: ACTION.TO_SET_PRICE_USD,
-          payload: await ANQSwapContract.methods.rate().call(),
+          type: ACTION.OUTPUT_SET_PRICE_USD,
+          payload: 1000,
+          // payload: await ANQSwapContract.methods.rate().call(),
         });
         dispatch({
-          type: ACTION.FROM_SET_AMOUNT,
-          payload: '',
+          type: ACTION.INPUT_SET_AMOUNT,
+          payload: "",
         });
         dispatch({
-          type: ACTION.TO_SET_AMOUNT,
-          payload: '',
+          type: ACTION.OUTPUT_SET_AMOUNT,
+          payload: "",
         });
       })();
   }, [accounts]);
@@ -126,60 +118,89 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
       // setEthPrice(data.ethereum.usd);
 
       dispatch({
-        type: ACTION.FROM_SET_PRICE_USD,
+        type: ACTION.INPUT_SET_PRICE_USD,
         payload: 2443.34,
       });
     })();
   }, [web3]);
-  console.log(ANQSwapContract);
 
-  const handleSwap = useCallback(async () => {
-    web3 &&
-      (async () => {
-        // console.log(state.from.amount, state.to.amount);
-        state.from.symbol === 'ETH'
-          ? (() => {
-              // console.log('buy', web3.utils.toWei(state.from.amount));
-              ANQSwapContract.methods
-                .buyTokens()
-                .send({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(state.from.amount)) });
-            })()
-          : (() => {
-              // console.log('sell', web3.utils.toWei(state.from.amount));
-              ANQContract.methods.approve(ANQSwapContract.options.address).call({ from: accounts[0] });
-              ANQSwapContract.methods
-                .sellTokens(web3.utils.toWei(web3.utils.toBN(state.from.amount)))
-                .call({ from: accounts[0] });
-            })();
-      })();
-  }, [web3, state.from.symbol, state.from.amount, state.to.amount]);
+  // const handleSwap = useCallback(async () => {
+  //   web3 &&
+  //     (async () => {
+  //       // console.log(state.from.amount, state.output.amount);
+  //       state.from.symbol === 'ETH'
+  //         ? (() => {
+  //             // console.log('buy', web3.utils.toWei(state.from.amount));
+  //             ANQSwapContract.methods
+  //               .buyTokens()
+  //               .send({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(state.from.amount)) });
+  //           })()
+  //         : (() => {
+  //             // console.log('sell', web3.utils.toWei(state.from.amount));
+  //             ANQContract.methods.approve(ANQSwapContract.options.address).call({ from: accounts[0] });
+  //             ANQSwapContract.methods
+  //               .sellTokens(web3.utils.toWei(web3.utils.toBN(state.from.amount)))
+  //               .call({ from: accounts[0] });
+  //           })();
+  //     })();
+  // }, [web3, state.from.symbol, state.from.amount, state.output.amount]);
 
-  const handleFromAmount = useCallback((amount) => {
-    dispatch({ type: ACTION.FROM_SET_AMOUNT, payload: amount });
+  const handleSwap = useCallback(() => {}, [
+    web3,
+    state.input.symbol,
+    state.input.amount,
+    state.output.amount,
+  ]);
+
+  const handleInputAmount = useCallback((amount, prevAmount) => {
+    // console.log(amount, prevAmount);
+
+    let match = handleInputOutputPattern(amount);
+    // console.log(match);
+
+    // TODO add logic to doesn't setState if value doesn't change
+    // match &&
+    //   dispatch({
+    //     type: ACTION.FROM_SET_AMOUNT,
+    //     payload: match ? match : prevAmount,
+    //   });
+
+    dispatch({
+      type: ACTION.INPUT_SET_AMOUNT,
+      payload: match !== null ? match : prevAmount,
+    });
   }, []);
 
-  const handleToAmount = useCallback((amount) => {
-    dispatch({ type: ACTION.TO_SET_AMOUNT, payload: amount });
-  }, []);
+  // Update output amount
+  useDebounce(
+    async () => {
+      // ANQContract.methods.approve(ANQSwapContract.options.address).call({ from: accounts[0] });
+      console.log(state.input.amount);
+      const predirectExactOut = await ANQSwapContract.methods
+        .predirectExactOut(web3.utils.toWei(state.input.amount), 0)
+        .call();
 
-  const handleCheckPattern = (event, set, prevValue) => {
-    let match = event.target.value.match(/^(\d{0,7}[.,]\d{0,18})$|^(\d{0,7})$/g);
-    match = match[0] === '.' ? '0.' : match;
-    event.target.value = match ? match : prevValue;
-    set(match ? match : prevValue);
-  };
+      console.log(predirectExactOut);
+
+      dispatch({
+        type: ACTION.OUTPUT_SET_AMOUNT,
+        payload: web3.utils.fromWei(predirectExactOut),
+      });
+    },
+    1000,
+    [state.input.amount]
+  );
 
   return (
     <div className="flex items-center justify-center w-max backdrop-blur  bg-zinc-900 rounded-xl my-5">
       <div className="h-full w-full p-4 text-base">
         <InputFrom
-          balance={state.from.balance}
-          valueOfAmount={state.from.priceUSD}
-          symbol={state.from.symbol}
-          patternCheck={handleCheckPattern}
-          coinAmount={state.from.amount}
-          setCoinAmount={handleFromAmount}
-          web3={web3}
+          balance={state.input.balance}
+          valueOfAmount={state.input.priceUSD}
+          symbol={state.input.symbol}
+          // patternCheck={handleCheckPattern}
+          coinAmount={state.input.amount}
+          setCoinAmount={handleInputAmount}
         ></InputFrom>
         <div className="flex justify-center pt-4">
           <div
@@ -204,27 +225,39 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
           </div>
         </div>
         <InputTo
-          balance={state.to.balance}
-          symbol={state.to.symbol}
-          patternCheck={handleCheckPattern}
-          coinAmount={state.to.amount}
-          setCoinAmount={handleToAmount}
-          web3={web3}
+          balance={state.output.balance}
+          symbol={state.output.symbol}
+          patternCheck={handleInputOutputPattern}
+          coinAmount={state.output.amount}
+          // setCoinAmount={handleOutputAmount}
+          setCoinAmount={handleInputAmount}
         ></InputTo>
         <div className="p-1 flex items-top gap-1">
-          <svg width="17" height="17" viewBox="0 0 24 24" className="inline-block mt-1 fill-slate-500 cursor-help">
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            className="inline-block mt-1 fill-slate-500 cursor-help"
+          >
             <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2.033 16.01c.564-1.789 1.632-3.932 1.821-4.474.273-.787-.211-1.136-1.74.209l-.34-.64c1.744-1.897 5.335-2.326 4.113.613-.763 1.835-1.309 3.074-1.621 4.03-.455 1.393.694.828 1.819-.211.153.25.203.331.356.619-2.498 2.378-5.271 2.588-4.408-.146zm4.742-8.169c-.532.453-1.32.443-1.761-.022-.441-.465-.367-1.208.164-1.661.532-.453 1.32-.442 1.761.022.439.466.367 1.209-.164 1.661z" />
           </svg>
           <p className=" text-slate-400 ">
-            {`1 ${state.from.symbol} ≈ ${
-              state.to.priceUSD !== 0 ? (state.from.priceUSD / state.to.priceUSD).toFixed(10) + ' ' + state.to.symbol : ' '
+            {`1 ${state.input.symbol} ≈ ${
+              state.output.priceUSD !== 0
+                ? (state.input.priceUSD / state.output.priceUSD).toFixed(10) +
+                  " " +
+                  state.output.symbol
+                : " "
             } 
-            ($${state.from.priceUSD ? state.from.priceUSD : '0'})`}
+            ($${state.input.priceUSD ? state.input.priceUSD : "0"})`}
           </p>
         </div>
         <div className="flex justify-center flex-col py-2">
           <Button onClick={handleSwap}>swap</Button>
-          <Button onClick={() => dispatch({ type: ACTION.REVERT })} type="ghost">
+          <Button
+            onClick={() => dispatch({ type: ACTION.REVERT })}
+            type="ghost"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               x="0px"

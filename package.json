@@ -17,14 +17,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anteqkois/first-simple-dapp.git"
+    "url": "git+https://github.com/anteqkois/ANQSwap.git"
   },
   "author": "Antek Kois",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/anteqkois/first-simple-dapp/issues"
+    "url": "https://github.com/anteqkois/ANQSwap/issues"
   },
-  "homepage": "https://github.com/anteqkois/first-simple-dapp#readme",
+  "homepage": "https://github.com/anteqkois/ANQSwap#readme",
   "dependencies": {
     "@openzeppelin/contracts": "^4.4.2",
     "chai": "^4.3.4",

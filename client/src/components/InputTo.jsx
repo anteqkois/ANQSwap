@@ -1,6 +1,6 @@
 import React from 'react';
 
-const InputTo = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol, web3 }) => {
+const InputTo = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol }) => {
   return (
     <>
       <p className="pb-0.5 px-4 text-right text-sm text-slate-400">Your balance: {balance ? balance : 0}</p>

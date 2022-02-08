@@ -1,14 +1,17 @@
 import React from 'react';
 
-const InputFrom = ({ balance, coinAmount, setCoinAmount, patternCheck, symbol, valueOfAmount, web3 }) => {
+const InputFrom = ({ balance, coinAmount, setCoinAmount, symbol, valueOfAmount }) => {
   // const handleCheckPattern = (event, setCoinAmount) => patternCheck(event, setCoinAmount);
 
   return (
     <>
-      <p className="p-0.5 px-4 text-right text-sm text-slate-400">Your balance: {balance ? balance : 0}</p>
+      <p className="p-0.5 px-4 text-right text-sm text-slate-400">
+        Your balance: {balance ? balance : 0}
+      </p>
       <div className="rounded-xl bg-zinc-800 w-full h-16  text-2xl text-slate-50 font-mono relative">
         <input
-          onChange={(event) => patternCheck(event, setCoinAmount, coinAmount)}
+          // onChange={(event) => patternCheck(event, setCoinAmount, coinAmount)}
+          onChange={(event) => setCoinAmount(event.target.value, coinAmount)}
           value={coinAmount}
           type="text"
           inputMode="decimal"
