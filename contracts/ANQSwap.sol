@@ -36,7 +36,7 @@ contract ANQSwap is Ownable {
 	function predirectExactOut(uint256 _amountETHIn, uint256 _amountANQIn) external view returns (uint256 amountOut) {
 		(uint256 reserve0, uint256 reserve1) = _getReserve();
 
-		require(_amountETHIn > 0 || _amountANQIn > 0, "Invalid out tokens");
+		require(_amountETHIn > 0 || _amountANQIn > 0, "Invalid in tokens");
 
 		// Check which token will in
 		uint256 amountIn = _amountETHIn > 0 ? _amountETHIn : _amountANQIn;
