@@ -5,6 +5,11 @@ module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(AnteqToken);
   const token = await AnteqToken.deployed();
   const swap = await deployer.deploy(ANQSwap, token.address);
-  // await token.transfer(swap.address, '999900000000000000000000');
-  // await token.transfer(accounts[0], '100000000000000000000');
+
+  // Add liquidity to swap
+  await token.approve(swap.address, web3.utils.toWei(web3.utils.toBN(100_000), 'ether'), { from: accounts[0] });
+  await swap.addInitialLiquidity(web3.utils.toWei(web3.utils.toBN(100_000), 'ether'), {
+    from: accounts[0],
+    value: web3.utils.toWei(web3.utils.toBN(50), 'ether'),
+  });
 };

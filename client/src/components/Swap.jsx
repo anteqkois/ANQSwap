@@ -15,6 +15,8 @@ const ACTION = {
   OUTPUT_SET_AMOUNT: "OUTPUT_SET_AMOUNT",
   OUTPUT_SET_SYMBOL: "OUTPUT_SET_SYMBOL",
   REVERT: "REVERT",
+  LOCK_ON: "LOCK_ON",
+  LOCK_OFF: "LOCK_OFF",
 };
 
 const reducer = (state, action) => {
@@ -55,6 +57,17 @@ const reducer = (state, action) => {
     case ACTION.REVERT:
       return { input: state.output, output: state.input };
       break;
+    case ACTION.LOCK_ON:
+      return {
+        ...state,
+        lock: true,
+      };
+    case ACTION.LOCK_OFF:
+      return {
+        ...state,
+        lock: false,
+      };
+      break;
 
     default:
       return state;
@@ -75,6 +88,7 @@ const initialState = {
     amount: "",
     symbol: "ANQ",
   },
+  lock: false,
 };
 
 const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
@@ -153,42 +167,75 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
   ]);
 
   const handleInputAmount = useCallback((amount, prevAmount) => {
-    // console.log(amount, prevAmount);
-
     let match = handleInputOutputPattern(amount);
-    // console.log(match);
 
-    // TODO add logic to doesn't setState if value doesn't change
-    // match &&
-    //   dispatch({
-    //     type: ACTION.FROM_SET_AMOUNT,
-    //     payload: match ? match : prevAmount,
-    //   });
-
-    dispatch({
-      type: ACTION.INPUT_SET_AMOUNT,
-      payload: match !== null ? match : prevAmount,
-    });
+    match !== null &&
+      (() => {
+        dispatch({
+          type: ACTION.INPUT_SET_AMOUNT,
+          payload: match,
+        });
+      })();
   }, []);
+  const handleOutputAmount = useCallback((amount, prevAmount) => {
+    let match = handleInputOutputPattern(amount);
+
+    match !== null &&
+      (() => {
+        dispatch({
+          type: ACTION.OUTPUT_SET_AMOUNT,
+          payload: match,
+        });
+      })();
+  }, []);
+
+  //lock updating reretrence
+  useDebounce(
+    () => {
+      state.lock && dispatch({ type: ACTION.LOCK_OFF });
+    },
+    0,
+    [state.lock]
+  );
 
   // Update output amount
   useDebounce(
     async () => {
       // ANQContract.methods.approve(ANQSwapContract.options.address).call({ from: accounts[0] });
-      console.log(state.input.amount);
       const predirectExactOut = await ANQSwapContract.methods
         .predirectExactOut(web3.utils.toWei(state.input.amount), 0)
         .call();
 
-      console.log(predirectExactOut);
-
-      dispatch({
-        type: ACTION.OUTPUT_SET_AMOUNT,
-        payload: web3.utils.fromWei(predirectExactOut),
-      });
+      !state.lock &&
+        dispatch({
+          type: ACTION.OUTPUT_SET_AMOUNT,
+          payload: web3.utils.fromWei(predirectExactOut),
+          // payload: parseFloat(web3.utils.fromWei(predirectExactOut)).toFixed(5),
+        });
+      !state.lock && dispatch({ type: ACTION.LOCK_ON });
     },
     1000,
     [state.input.amount]
+  );
+
+  // Update input amount
+  useDebounce(
+    async () => {
+      // ANQContract.methods.approve(ANQSwapContract.options.address).call({ from: accounts[0] });
+      const predirectExactIn = await ANQSwapContract.methods
+        .predirectExactIn(0, web3.utils.toWei(state.output.amount))
+        .call();
+
+      !state.lock &&
+        dispatch({
+          type: ACTION.INPUT_SET_AMOUNT,
+          payload: web3.utils.fromWei(predirectExactIn),
+          // payload: parseFloat(web3.utils.fromWei(predirectExactIn)).toFixed(5),
+        });
+      !state.lock && dispatch({ type: ACTION.LOCK_ON });
+    },
+    1000,
+    [state.output.amount]
   );
 
   return (
@@ -230,7 +277,7 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
           patternCheck={handleInputOutputPattern}
           coinAmount={state.output.amount}
           // setCoinAmount={handleOutputAmount}
-          setCoinAmount={handleInputAmount}
+          setCoinAmount={handleOutputAmount}
         ></InputTo>
         <div className="p-1 flex items-top gap-1">
           <svg
