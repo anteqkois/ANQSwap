@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "predev-client": "git pull",
     "dev-client": "cd client && npm start",
     "precommit": "truffle test",
     "commit": "git add . && git commit -u",

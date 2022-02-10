@@ -1,9 +1,19 @@
-import React, { useState, useEffect, useReducer, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useReducer,
+  useCallback,
+} from "react";
 import useDebounce from "../hooks/useDebounce";
-import handleInputOutputPattern from "../helpers/handleInputOutputPattern";
+import {
+  handleInputPattern,
+  handleOutputPattern,
+} from "../helpers/amountPattern";
 import Button from "./Button";
 import InputFrom from "./InputFrom";
 import InputTo from "./InputTo";
+import PredirectFromOneInfo from "./PredirectFromOneInfo";
 
 const ACTION = {
   INPUT_SET_BALANCE: "INPUT_SET_BALANCE",
@@ -92,7 +102,7 @@ const initialState = {
 };
 
 const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
-  // const [isBuying, setIsBuying] = useState(true);
+  const [outputAmountFromOne, setOutputAmountFromOne] = useState("");
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -112,6 +122,7 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
         dispatch({
           type: ACTION.OUTPUT_SET_PRICE_USD,
           payload: 1000,
+          //TODO calculate price to USD from 1ANQ
           // payload: await ANQSwapContract.methods.rate().call(),
         });
         dispatch({
@@ -125,6 +136,7 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
       })();
   }, [ANQContract, accounts, web3]);
 
+  // get ETH price in USD from coingecko API
   useEffect(() => {
     (async () => {
       // let data = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
@@ -133,10 +145,24 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
 
       dispatch({
         type: ACTION.INPUT_SET_PRICE_USD,
-        payload: 2443.34,
+        payload: 3243.34,
       });
     })();
   }, [web3]);
+
+  // calculate amount of token from one token from input
+  useEffect(() => {
+    ANQSwapContract &&
+      (async () => {
+        const eth = state.input.symbol === "ETH" ? web3.utils.toWei("1") : 0;
+        const anq = state.input.symbol === "ETH" ? 0 : web3.utils.toWei("1");
+
+        const amountFromOne = web3.utils.fromWei(
+          await ANQSwapContract.methods.predirectExactOut(eth, anq).call()
+        );
+        setOutputAmountFromOne(amountFromOne);
+      })();
+  }, [web3, ANQSwapContract, state.input.symbol]);
 
   // const handleSwap = useCallback(async () => {
   //   web3 &&
@@ -168,7 +194,7 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
 
   // TODO combine two function to one to update amount (check from triger and call right dispatch)
   const handleInputAmount = useCallback((amount, prevAmount) => {
-    let match = handleInputOutputPattern(amount);
+    let match = handleInputPattern(amount);
 
     match !== null &&
       (() => {
@@ -180,7 +206,7 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
   }, []);
 
   const handleOutputAmount = useCallback((amount, prevAmount) => {
-    let match = handleInputOutputPattern(amount);
+    let match = handleInputPattern(amount);
 
     match !== null &&
       (() => {
@@ -205,19 +231,17 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
     async () => {
       !state.lock &&
         (async () => {
+          const predirectOut =
+            state.input.amount !== ""
+              ? web3.utils.fromWei(
+                  await ANQSwapContract.methods
+                    .predirectExactOut(web3.utils.toWei(state.input.amount), 0)
+                    .call()
+                )
+              : "";
           dispatch({
             type: ACTION.OUTPUT_SET_AMOUNT,
-            payload:
-              state.input.amount !== ""
-                ? web3.utils.fromWei(
-                    await ANQSwapContract.methods
-                      .predirectExactOut(
-                        web3.utils.toWei(state.input.amount),
-                        0
-                      )
-                      .call()
-                  )
-                : "",
+            payload: handleOutputPattern(predirectOut),
           });
           dispatch({ type: ACTION.LOCK_ON });
         })();
@@ -231,19 +255,17 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
     async () => {
       !state.lock &&
         (async () => {
+          const predirectIn =
+            state.output.amount !== ""
+              ? web3.utils.fromWei(
+                  await ANQSwapContract.methods
+                    .predirectExactIn(0, web3.utils.toWei(state.output.amount))
+                    .call()
+                )
+              : "";
           dispatch({
             type: ACTION.INPUT_SET_AMOUNT,
-            payload:
-              state.output.amount !== ""
-                ? web3.utils.fromWei(
-                    await ANQSwapContract.methods
-                      .predirectExactIn(
-                        0,
-                        web3.utils.toWei(state.output.amount)
-                      )
-                      .call()
-                  )
-                : "",
+            payload: handleOutputPattern(predirectIn),
           });
           dispatch({ type: ACTION.LOCK_ON });
         })();
@@ -288,16 +310,13 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
           >
             <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2.033 16.01c.564-1.789 1.632-3.932 1.821-4.474.273-.787-.211-1.136-1.74.209l-.34-.64c1.744-1.897 5.335-2.326 4.113.613-.763 1.835-1.309 3.074-1.621 4.03-.455 1.393.694.828 1.819-.211.153.25.203.331.356.619-2.498 2.378-5.271 2.588-4.408-.146zm4.742-8.169c-.532.453-1.32.443-1.761-.022-.441-.465-.367-1.208.164-1.661.532-.453 1.32-.442 1.761.022.439.466.367 1.209-.164 1.661z" />
           </svg>
-          <p className=" text-slate-400 ">
-            {`1 ${state.input.symbol} ≈ ${
-              state.output.priceUSD !== 0
-                ? (state.input.priceUSD / state.output.priceUSD).toFixed(10) +
-                  " " +
-                  state.output.symbol
-                : " "
-            } 
-            ($${state.input.priceUSD ? state.input.priceUSD : "0"})`}
-          </p>
+          <PredirectFromOneInfo
+            inputSymbol={state.input.symbol}
+            outputSymbol={state.output.symbol}
+            inputPriceUSD={state.input.priceUSD}
+            outputPriceUSD={state.output.priceUSD}
+            outputAmountFromOne={outputAmountFromOne}
+          />
         </div>
         <div className="flex justify-center flex-col py-2">
           <Button onClick={handleSwap}>swap</Button>
