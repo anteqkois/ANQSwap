@@ -20,11 +20,6 @@ const InputTo = ({ balance, coinAmount, setCoinAmount, symbol }) => {
           id="anqAmount"
           placeholder="0"
           className="p-4 pr-16 text-right w-full h-full bg-transparent focus:outline-none"
-          // className={`tooltip p-4 pr-16 text-right w-full h-full bg-transparent focus:outline-none ${
-          //   !web3 && 'cursor-not-allowed'
-          // }`}
-          // disabled={!web3}
-          // title={!web3 && 'Connect your wallet'}
         />
         <span className="absolute right-4 top-1/2 -translate-y-1/2">
           {symbol}

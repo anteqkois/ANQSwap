@@ -1,8 +1,6 @@
 import React from 'react';
 
 const InputFrom = ({ balance, coinAmount, setCoinAmount, symbol, valueOfAmount }) => {
-  // const handleCheckPattern = (event, setCoinAmount) => patternCheck(event, setCoinAmount);
-
   return (
     <>
       <p className="p-0.5 px-4 text-right text-sm text-slate-400">
@@ -10,7 +8,6 @@ const InputFrom = ({ balance, coinAmount, setCoinAmount, symbol, valueOfAmount }
       </p>
       <div className="rounded-xl bg-zinc-800 w-full h-16  text-2xl text-slate-50 font-mono relative">
         <input
-          // onChange={(event) => patternCheck(event, setCoinAmount, coinAmount)}
           onChange={(event) => setCoinAmount(event.target.value, coinAmount)}
           value={coinAmount}
           type="text"
@@ -23,15 +20,10 @@ const InputFrom = ({ balance, coinAmount, setCoinAmount, symbol, valueOfAmount }
           id="ethAmount"
           placeholder="0"
           className=" p-4 pr-16 pb-8 text-right w-full h-full bg-transparent focus:outline-none"
-          // className={`tooltip p-4 pr-16 pb-8 text-right w-full h-full bg-transparent focus:outline-none ${
-          //   !web3 && 'cursor-not-allowed'
-          // }`}
-          // disabled={!web3}
-          // title={!web3 && 'Connect your wallet'}
         />
         <span className="absolute right-4 pt-2">{symbol}</span>
         <p className="p-0.5 px-4 text-right text-sm text-slate-400 absolute bottom-1 right-1">
-          ${(valueOfAmount * coinAmount).toFixed(3)}
+          ${(valueOfAmount * coinAmount).toFixed(8)}
         </p>
       </div>
     </>

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ANQSwap from "./contracts/ANQSwap.json";
 import AnteqToken from "./contracts/AnteqToken.json";
 import Web3 from "web3";
 import StatusBar from "./components/StatusBar";
 import Swap from "./components/Swap";
-import TestDobounce from "./components/TestDobounce";
 
 export const App = () => {
   const [web3, setWeb3] = useState(null);
@@ -42,7 +41,6 @@ export const App = () => {
   };
 
   return (
-    // <TestDobounce></TestDobounce>
     <div className="w-screen p-4 flex flex-col h-screen bg-zinc-800 text-slate-300">
       <StatusBar account={accounts} connectWallet={handleConnect}></StatusBar>
       <div className=" flex items-center justify-center md:h-3/4">
@@ -51,6 +49,7 @@ export const App = () => {
           accounts={accounts}
           ANQSwapContract={ANQSwapContract}
           ANQContract={ANQContract}
+          connectWallet={handleConnect}
         />
       </div>
     </div>

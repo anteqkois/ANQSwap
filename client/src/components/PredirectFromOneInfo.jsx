@@ -8,7 +8,7 @@ const PredirectFromOneInfo = ({
   outputAmountFromOne,
 }) => {
   return (
-    <p className=" text-slate-400 ">
+    <p className=" text-slate-400 h-10">
       {outputAmountFromOne
         ? (() => {
             return `1 ${inputSymbol} ≈ ${

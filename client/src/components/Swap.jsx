@@ -101,11 +101,18 @@ const initialState = {
   lock: false,
 };
 
-const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
+const Swap = ({
+  accounts,
+  web3,
+  ANQSwapContract,
+  ANQContract,
+  connectWallet,
+}) => {
   const [outputAmountFromOne, setOutputAmountFromOne] = useState("");
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // update reducer state, get ETH price in USD from coingecko API and set price 1 ANQ
   useEffect(() => {
     accounts &&
       (async () => {
@@ -120,12 +127,6 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
           ),
         });
         dispatch({
-          type: ACTION.OUTPUT_SET_PRICE_USD,
-          payload: 1000,
-          //TODO calculate price to USD from 1ANQ
-          // payload: await ANQSwapContract.methods.rate().call(),
-        });
-        dispatch({
           type: ACTION.INPUT_SET_AMOUNT,
           payload: "",
         });
@@ -133,22 +134,24 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
           type: ACTION.OUTPUT_SET_AMOUNT,
           payload: "",
         });
+        const ethPrice = 3243.34;
+        dispatch({
+          type: ACTION.INPUT_SET_PRICE_USD,
+          payload: ethPrice,
+        });
+
+        const amountETHForOneANQ = web3.utils.fromWei(
+          await ANQSwapContract.methods
+            .predirectExactOut(0, web3.utils.toWei("1"))
+            .call()
+        );
+
+        dispatch({
+          type: ACTION.OUTPUT_SET_PRICE_USD,
+          payload: (amountETHForOneANQ * ethPrice).toFixed(8),
+        });
       })();
-  }, [ANQContract, accounts, web3]);
-
-  // get ETH price in USD from coingecko API
-  useEffect(() => {
-    (async () => {
-      // let data = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-      // data = await data.json();
-      // setEthPrice(data.ethereum.usd);
-
-      dispatch({
-        type: ACTION.INPUT_SET_PRICE_USD,
-        payload: 3243.34,
-      });
-    })();
-  }, [web3]);
+  }, [ANQContract, ANQSwapContract, accounts, web3]);
 
   // calculate amount of token from one token from input
   useEffect(() => {
@@ -318,8 +321,10 @@ const Swap = ({ accounts, web3, ANQSwapContract, ANQContract }) => {
             outputAmountFromOne={outputAmountFromOne}
           />
         </div>
-        <div className="flex justify-center flex-col py-2">
-          <Button onClick={handleSwap}>swap</Button>
+        <div className="flex justify-center flex-col py-2 gap-2">
+          <Button onClick={accounts ? handleSwap : connectWallet}>
+            {accounts ? "swap" : "connect wallet"}
+          </Button>
           <Button
             onClick={() => dispatch({ type: ACTION.REVERT })}
             type="ghost"
