@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+//TODO Use safe math
+
 contract AnteqToken {
     string private _name = "AnteqToken";
     string private _symbol = "ANQ";
@@ -50,7 +52,7 @@ contract AnteqToken {
             "Not enought token on sender address."
         );
         _balanceOf[msg.sender] = _balanceOf[msg.sender] - _value;
-        _balanceOf[_to] = _value;
+        _balanceOf[_to] = _balanceOf[_to] + _value;
         emit Transfer(msg.sender, _to, _value);
         return true;
     }

@@ -14,7 +14,7 @@ const InputTo = ({ balance, coinAmount, setCoinAmount, symbol }) => {
           inputMode="decimal"
           autoComplete="off"
           autoCorrect="off"
-          pattern="^[0-9]*[.,]?[0-9]*$"
+          // pattern="^[0-9]*[.,]?[0-9]*$"
           spellCheck="false"
           name="anqAmount"
           id="anqAmount"

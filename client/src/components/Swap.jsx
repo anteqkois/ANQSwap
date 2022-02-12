@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useMemo,
-  useEffect,
-  useReducer,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useReducer, useCallback } from "react";
 import useDebounce from "../hooks/useDebounce";
 import {
   handleInputPattern,
@@ -25,8 +19,21 @@ const ACTION = {
   OUTPUT_SET_AMOUNT: "OUTPUT_SET_AMOUNT",
   OUTPUT_SET_SYMBOL: "OUTPUT_SET_SYMBOL",
   REVERT: "REVERT",
+  SET_SWAP_TYPE: "SET_SWAP_TYPE",
   LOCK_ON: "LOCK_ON",
   LOCK_OFF: "LOCK_OFF",
+  LOADING_ON: "LOADING_ON",
+  LOADING_OFF: "LOADING_OFF",
+};
+
+const SWAP_TYPE = {
+  BUY: {
+    EXACT_ETH_FOR_TOKENS: "EXACT_ETH_FOR_TOKENS",
+  },
+  SELL: {
+    EXACT_TOKENS_FOR_ETH: "EXACT_TOKENS_FOR_ETH",
+    TOKENS_FOR_EXACT_ETH: "TOKENS_FOR_EXACT_ETH",
+  },
 };
 
 const reducer = (state, action) => {
@@ -65,7 +72,17 @@ const reducer = (state, action) => {
       return { ...state, output: { ...state.output, symbol: action.payload } };
       break;
     case ACTION.REVERT:
-      return { input: state.output, output: state.input, lock: true };
+      return {
+        ...state,
+        input: state.output,
+        output: state.input,
+        lock: true,
+        swapType:
+          state.input.symbol === "ETH"
+            ? SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH
+            : SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS,
+        loading: state.input.amount === "" ? false : true,
+      };
       break;
     case ACTION.LOCK_ON:
       return {
@@ -76,6 +93,23 @@ const reducer = (state, action) => {
       return {
         ...state,
         lock: false,
+      };
+      break;
+    case ACTION.SET_SWAP_TYPE:
+      return {
+        ...state,
+        swapType: action.payload,
+      };
+      break;
+    case ACTION.LOADING_ON:
+      return {
+        ...state,
+        loading: true,
+      };
+    case ACTION.LOADING_OFF:
+      return {
+        ...state,
+        loading: false,
       };
       break;
 
@@ -99,6 +133,8 @@ const initialState = {
     symbol: "ANQ",
   },
   lock: false,
+  swapType: SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS,
+  loading: false,
 };
 
 const Swap = ({
@@ -108,7 +144,7 @@ const Swap = ({
   ANQContract,
   connectWallet,
 }) => {
-  const [outputAmountFromOne, setOutputAmountFromOne] = useState("");
+  const [inputAmountForOneOutput, setInputAmountForOneOutput] = useState("");
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -153,77 +189,200 @@ const Swap = ({
       })();
   }, [ANQContract, ANQSwapContract, accounts, web3]);
 
-  // calculate amount of token from one token from input
-  useEffect(() => {
-    ANQSwapContract &&
-      (async () => {
-        const eth = state.input.symbol === "ETH" ? web3.utils.toWei("1") : 0;
-        const anq = state.input.symbol === "ETH" ? 0 : web3.utils.toWei("1");
+  const handleSwap = async () => {
+    switch (state.swapType) {
+      case SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS:
+        state.input.amount &&
+          (await ANQSwapContract.methods.swapExactETHForTokens().send({
+            from: accounts[0],
+            value: web3.utils.toWei(state.input.amount),
+          }));
+        break;
+      case SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH:
+        state.input.amount &&
+          (await ANQContract.methods
+            .approve(
+              ANQSwapContract.options.address,
+              web3.utils.toWei(state.input.amount)
+            )
+            .send({ from: accounts[0] }));
 
-        const amountFromOne = web3.utils.fromWei(
-          await ANQSwapContract.methods.predirectExactOut(eth, anq).call()
-        );
-        setOutputAmountFromOne(amountFromOne);
-      })();
-  }, [web3, ANQSwapContract, state.input.symbol]);
+        state.input.amount &&
+          (await ANQSwapContract.methods
+            .swapExactTokensforETH(web3.utils.toWei(state.input.amount))
+            .send({
+              from: accounts[0],
+            }));
+        break;
+      case SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH:
+        state.input.amount &&
+          (await ANQContract.methods
+            .approve(
+              ANQSwapContract.options.address,
+              web3.utils.toWei(state.input.amount)
+            )
+            .send({ from: accounts[0] }));
+
+        state.output.amount &&
+          (await ANQSwapContract.methods
+            .swapTokensforExactETH(web3.utils.toWei(state.output.amount))
+            .send({
+              from: accounts[0],
+            }));
+        break;
+
+      default:
+        break;
+    }
+  };
 
   // const handleSwap = useCallback(async () => {
-  //   web3 &&
+  //   accounts &&
   //     (async () => {
-  //       // console.log(state.from.amount, state.output.amount);
-  //       state.from.symbol === 'ETH'
-  //         ? (() => {
-  //             // console.log('buy', web3.utils.toWei(state.from.amount));
-  //             ANQSwapContract.methods
-  //               .buyTokens()
-  //               .send({ from: accounts[0], value: web3.utils.toWei(web3.utils.toBN(state.from.amount)) });
-  //           })()
-  //         : (() => {
-  //             // console.log('sell', web3.utils.toWei(state.from.amount));
-  //             ANQContract.methods.approve(ANQSwapContract.options.address).call({ from: accounts[0] });
-  //             ANQSwapContract.methods
-  //               .sellTokens(web3.utils.toWei(web3.utils.toBN(state.from.amount)))
-  //               .call({ from: accounts[0] });
-  //           })();
-  //     })();
-  // }, [web3, state.from.symbol, state.from.amount, state.output.amount]);
+  //       switch (state.swapType) {
+  //         case SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS:
+  //           state.from.amount &&
+  //             (await ANQSwapContract.methods.swapExactETHForTokens().send({
+  //               from: accounts[0],
+  //               value: web3.utils.toWei(web3.utils.toBN(state.from.amount)),
+  //             }));
+  //           break;
+  //         case SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH:
+  //           state.from.amount &&
+  //             (await ANQContract.methods
+  //               .approve(
+  //                 ANQSwapContract.options.address,
+  //                 web3.utils.toWei(web3.utils.toBN(state.from.amount))
+  //               )
+  //               .call({ from: accounts[0] }));
 
-  const handleSwap = useCallback(() => {}, [
-    web3,
-    state.input.symbol,
-    state.input.amount,
-    state.output.amount,
-  ]);
+  //           state.from.amount &&
+  //             (await ANQSwapContract.methods
+  //               .swapExactTokensforETH(
+  //                 web3.utils.toWei(web3.utils.toBN(state.from.amount))
+  //               )
+  //               .send({
+  //                 from: accounts[0],
+  //               }));
+  //           break;
+  //         case SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH:
+  //           state.from.amount &&
+  //             (await ANQContract.methods.approve(
+  //               ANQSwapContract.options.address,
+  //               web3.utils.toWei(web3.utils.toBN(state.from.amount))
+  //             ));
+
+  //           state.output.amount &&
+  //             (await ANQSwapContract.methods
+  //               .swapTokensforExactETH(
+  //                 web3.utils.toWei(web3.utils.toBN(state.output.amount))
+  //               )
+  //               .send({
+  //                 from: accounts[0],
+  //               }));
+  //           break;
+
+  //         default:
+  //           break;
+  //       }
+  //     })();
+  // }, [state.swapType, state.from.amount, state.output.amount, accounts]);
+
+  // handle revert tokens
+  useDebounce(
+    () => {
+      const prev = state.output.amount;
+      dispatch({
+        type: ACTION.OUTPUT_SET_AMOUNT,
+        payload: "",
+      });
+      dispatch({
+        type: ACTION.OUTPUT_SET_AMOUNT,
+        payload: prev,
+      });
+    },
+    1200,
+    [state.input.symbol]
+  );
+
+  // calculate amount of token from one token from input
+  useDebounce(
+    () => {
+      state.input.amount &&
+        state.output.amount &&
+        (() => {
+          const MULTIPLIER = web3.utils.toBN(10).pow(web3.utils.toBN(18));
+
+          const numerator = web3.utils
+            .toBN(web3.utils.toWei(state.input.amount))
+            .mul(MULTIPLIER);
+
+          const denominator = web3.utils.toBN(
+            web3.utils.toWei(state.output.amount)
+          );
+
+          const amountFromOne = web3.utils.fromWei(numerator.div(denominator));
+          setInputAmountForOneOutput(amountFromOne);
+        })();
+    },
+    1000,
+    [state.input.amount, state.output.amount]
+  );
 
   // TODO combine two function to one to update amount (check from triger and call right dispatch)
-  const handleInputAmount = useCallback((amount, prevAmount) => {
-    let match = handleInputPattern(amount);
+  const handleInputAmount = useCallback(
+    (amount, prevAmount) => {
+      let match = handleInputPattern(amount);
 
-    match !== null &&
-      (() => {
-        dispatch({
-          type: ACTION.INPUT_SET_AMOUNT,
-          payload: match,
-        });
-      })();
-  }, []);
+      dispatch({
+        type: ACTION.SET_SWAP_TYPE,
+        payload:
+          state.input.symbol === "ETH"
+            ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
+            : SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH,
+      });
 
-  const handleOutputAmount = useCallback((amount, prevAmount) => {
-    let match = handleInputPattern(amount);
+      match !== null &&
+        (() => {
+          dispatch({
+            type: ACTION.INPUT_SET_AMOUNT,
+            payload: match,
+          });
+        })();
+    },
+    [state.input.symbol]
+  );
 
-    match !== null &&
-      (() => {
-        dispatch({
-          type: ACTION.OUTPUT_SET_AMOUNT,
-          payload: match,
-        });
-      })();
-  }, []);
+  const handleOutputAmount = useCallback(
+    (amount, prevAmount) => {
+      let match = handleInputPattern(amount);
+
+      dispatch({
+        type: ACTION.SET_SWAP_TYPE,
+        payload:
+          state.input.symbol === "ETH"
+            ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
+            : SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH,
+      });
+
+      match !== null &&
+        (() => {
+          dispatch({
+            type: ACTION.OUTPUT_SET_AMOUNT,
+            payload: match,
+          });
+        })();
+    },
+    [state.input.symbol]
+  );
 
   // to unlock for a short time (lock is to prevent infinity loop)
   useDebounce(
     () => {
       state.lock && dispatch({ type: ACTION.LOCK_OFF });
+      // dispatch({
+      //   type: ACTION.LOADING_OFF,
+      // });
     },
     1100,
     [state.lock]
@@ -234,23 +393,36 @@ const Swap = ({
     async () => {
       !state.lock &&
         (async () => {
+          const eth =
+            state.input.symbol === "ETH"
+              ? web3.utils.toWei(state.input.amount ? state.input.amount : "0")
+              : 0;
+          const anq =
+            state.input.symbol === "ETH"
+              ? 0
+              : web3.utils.toWei(state.input.amount ? state.input.amount : "0");
+
           const predirectOut =
             state.input.amount !== ""
               ? web3.utils.fromWei(
                   await ANQSwapContract.methods
-                    .predirectExactOut(web3.utils.toWei(state.input.amount), 0)
+                    .predirectExactOut(eth, anq)
                     .call()
                 )
               : "";
           dispatch({
             type: ACTION.OUTPUT_SET_AMOUNT,
-            payload: handleOutputPattern(predirectOut),
+            payload: predirectOut,
+            // payload: handleOutputPattern(predirectOut),
           });
           dispatch({ type: ACTION.LOCK_ON });
+          dispatch({
+            type: ACTION.LOADING_OFF,
+          });
         })();
     },
     1000,
-    [state.input.amount]
+    [state.input.amount, state.input.symbol]
   );
 
   // Update input amount and lock for a short time
@@ -258,28 +430,51 @@ const Swap = ({
     async () => {
       !state.lock &&
         (async () => {
+          const eth =
+            state.input.symbol === "ETH"
+              ? 0
+              : web3.utils.toWei(
+                  state.output.amount ? state.output.amount : "0"
+                );
+          const anq =
+            state.input.symbol === "ETH"
+              ? web3.utils.toWei(
+                  state.output.amount ? state.output.amount : "0"
+                )
+              : 0;
+
           const predirectIn =
             state.output.amount !== ""
               ? web3.utils.fromWei(
                   await ANQSwapContract.methods
-                    .predirectExactIn(0, web3.utils.toWei(state.output.amount))
+                    .predirectExactIn(eth, anq)
                     .call()
                 )
               : "";
+
           dispatch({
             type: ACTION.INPUT_SET_AMOUNT,
-            payload: handleOutputPattern(predirectIn),
+            payload: predirectIn,
+            // payload: handleOutputPattern(predirectIn),
           });
           dispatch({ type: ACTION.LOCK_ON });
+          dispatch({
+            type: ACTION.LOADING_OFF,
+          });
         })();
     },
     1000,
-    [state.output.amount]
+    [state.output.amount, state.input.symbol]
   );
 
   return (
     <div className="flex items-center justify-center w-max backdrop-blur  bg-zinc-900 rounded-xl my-5">
       <div className="h-full w-full p-4 text-base">
+        {state.loading && (
+          <div className="flex items-center justify-center absolute top-0 left-0 h-full w-full bg-zinc-900/90 rounded-xl z-50">
+            Loading...
+          </div>
+        )}
         <InputFrom
           balance={state.input.balance}
           valueOfAmount={state.input.priceUSD}
@@ -304,23 +499,13 @@ const Swap = ({
           coinAmount={state.output.amount}
           setCoinAmount={handleOutputAmount}
         ></InputTo>
-        <div className="p-1 flex items-top gap-1">
-          <svg
-            width="17"
-            height="17"
-            viewBox="0 0 24 24"
-            className="inline-block mt-1 fill-slate-500 cursor-help"
-          >
-            <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2.033 16.01c.564-1.789 1.632-3.932 1.821-4.474.273-.787-.211-1.136-1.74.209l-.34-.64c1.744-1.897 5.335-2.326 4.113.613-.763 1.835-1.309 3.074-1.621 4.03-.455 1.393.694.828 1.819-.211.153.25.203.331.356.619-2.498 2.378-5.271 2.588-4.408-.146zm4.742-8.169c-.532.453-1.32.443-1.761-.022-.441-.465-.367-1.208.164-1.661.532-.453 1.32-.442 1.761.022.439.466.367 1.209-.164 1.661z" />
-          </svg>
-          <PredirectFromOneInfo
-            inputSymbol={state.input.symbol}
-            outputSymbol={state.output.symbol}
-            inputPriceUSD={state.input.priceUSD}
-            outputPriceUSD={state.output.priceUSD}
-            outputAmountFromOne={outputAmountFromOne}
-          />
-        </div>
+        <PredirectFromOneInfo
+          inputSymbol={state.input.symbol}
+          outputSymbol={state.output.symbol}
+          inputPriceUSD={state.input.priceUSD}
+          outputPriceUSD={state.output.priceUSD}
+          inputAmountForOneOutput={inputAmountForOneOutput}
+        />
         <div className="flex justify-center flex-col py-2 gap-2">
           <Button onClick={accounts ? handleSwap : connectWallet}>
             {accounts ? "swap" : "connect wallet"}

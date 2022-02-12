@@ -85,6 +85,8 @@ contract('ANQSwap', (accounts) => {
     it('User can buy exact ANQ amount', async () => {
       // Want 1000 ANQ, calculate amount ETH to send
       const predirectExactIn = await anqSwap.predirectExactIn(0, toWei(1_000));
+      // const predirectExactInTEST = await anqSwap.predirectExactIn('50000000000000000000', '0');
+      // console.log(fromWei(predirectExactInTEST));
 
       // To check if contract calculate right ETH in amount
       const predirectExactOut = await anqSwap.predirectExactOut(predirectExactIn, 0);

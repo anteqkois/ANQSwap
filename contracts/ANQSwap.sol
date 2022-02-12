@@ -49,7 +49,7 @@ contract ANQSwap is Ownable {
 		(uint256 reserve0, uint256 reserve1) = _getReserve();
 		require(_amountETHOut > 0 || _amountANQOut > 0, "Invalid out tokens");
 
-		// Check which token will in
+		// Check which token will be incoming
 		uint256 amountOut = _amountETHOut > 0 ? _amountETHOut : _amountANQOut;
 		(uint256 reserveIn, uint256 reserveOut) = _amountETHOut > 0 ? (reserve1, reserve0) : (reserve0, reserve1);
 		amountIn = _getAmountIn(amountOut, reserveIn, reserveOut);
@@ -98,10 +98,10 @@ contract ANQSwap is Ownable {
 
 		if (_amountETHOut > 0) {
 			(bool sent, ) = _to.call{ value: _amountETHOut }("");
-			require(sent, "Failed to send Ether back");
+			require(sent, "Failed to send Ether");
 		} else {
 			bool sent = anteqToken.transfer(_to, _amountANQOut);
-			require(sent, "Failed to send AnteqToken back");
+			require(sent, "Failed to send AnteqToken");
 		}
 		return true;
 	}
