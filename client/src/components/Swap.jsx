@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer, useCallback } from "react";
 import useDebounce from "../hooks/useDebounce";
+import useModal from "../hooks/useModal";
 import {
   handleInputPattern,
   handleOutputPattern,
@@ -433,6 +434,8 @@ const Swap = ({
     [state.output.amount, state.input.symbol]
   );
 
+  const [Modal, setModal] = useModal();
+
   return (
     <div className="relative flex items-center justify-center w-max bg-zinc-900 rounded-xl my-5">
       <div className="h-full w-full p-4 text-base">
@@ -494,6 +497,8 @@ const Swap = ({
             </svg>
           </Button>
         </div>
+      <Modal>Działa ! Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis dolorem accusamus placeat excepturi sapiente beatae neque, voluptatem debitis a culpa. Nobis sequi inventore reprehenderit possimus quo fugiat consectetur nemo quas.
+      Officiis, voluptatem. Reprehenderit provident asperiores voluptatum fugiat numquam aspernatur! Laborum consequuntur quaerat consectetur esse eius aperiam, dolorem amet sunt, inventore distinctio exercitationem alias! Possimus magni sapiente sequi explicabo dolorum odio!</Modal>
       </div>
     </div>
   );
