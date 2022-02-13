@@ -22,8 +22,10 @@ const ACTION = {
   SET_SWAP_TYPE: "SET_SWAP_TYPE",
   LOCK_ON: "LOCK_ON",
   LOCK_OFF: "LOCK_OFF",
-  LOADING_ON: "LOADING_ON",
-  LOADING_OFF: "LOADING_OFF",
+  REVERT_LOADING_ON: "REVERT_LOADING_ON",
+  REVERT_LOADING_OFF: "REVERT_LOADING_OFF",
+  CALCULATE_LOADING_OFF: "CALCULATE_LOADING_OFF",
+  CALCULATE_LOADING_ON: "CALCULATE_LOADING_ON",
 };
 
 const SWAP_TYPE = {
@@ -81,7 +83,8 @@ const reducer = (state, action) => {
           state.input.symbol === "ETH"
             ? SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH
             : SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS,
-        loading: state.input.amount === "" ? false : true,
+        revertLoading: state.input.amount === "" ? false : true,
+        calculatePriceLoading: true,
       };
       break;
     case ACTION.LOCK_ON:
@@ -93,23 +96,36 @@ const reducer = (state, action) => {
       return {
         ...state,
         lock: false,
+        // calculatePriceLoading: false,
       };
       break;
     case ACTION.SET_SWAP_TYPE:
       return {
         ...state,
         swapType: action.payload,
+        calculatePriceLoading: true,
       };
       break;
-    case ACTION.LOADING_ON:
+    case ACTION.REVERT_LOADING_ON:
       return {
         ...state,
-        loading: true,
+        revertLoading: true,
       };
-    case ACTION.LOADING_OFF:
+    case ACTION.REVERT_LOADING_OFF:
       return {
         ...state,
-        loading: false,
+        revertLoading: false,
+      };
+      break;
+    case ACTION.CALCULATE_LOADING_ON:
+      return {
+        ...state,
+        calculatePriceLoading: true,
+      };
+    case ACTION.CALCULATE_LOADING_OFF:
+      return {
+        ...state,
+        calculatePriceLoading: false,
       };
       break;
 
@@ -134,7 +150,8 @@ const initialState = {
   },
   lock: false,
   swapType: SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS,
-  loading: false,
+  revertLoading: false,
+  calculatePriceLoading: false,
 };
 
 const Swap = ({
@@ -236,58 +253,6 @@ const Swap = ({
     }
   };
 
-  // const handleSwap = useCallback(async () => {
-  //   accounts &&
-  //     (async () => {
-  //       switch (state.swapType) {
-  //         case SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS:
-  //           state.from.amount &&
-  //             (await ANQSwapContract.methods.swapExactETHForTokens().send({
-  //               from: accounts[0],
-  //               value: web3.utils.toWei(web3.utils.toBN(state.from.amount)),
-  //             }));
-  //           break;
-  //         case SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH:
-  //           state.from.amount &&
-  //             (await ANQContract.methods
-  //               .approve(
-  //                 ANQSwapContract.options.address,
-  //                 web3.utils.toWei(web3.utils.toBN(state.from.amount))
-  //               )
-  //               .call({ from: accounts[0] }));
-
-  //           state.from.amount &&
-  //             (await ANQSwapContract.methods
-  //               .swapExactTokensforETH(
-  //                 web3.utils.toWei(web3.utils.toBN(state.from.amount))
-  //               )
-  //               .send({
-  //                 from: accounts[0],
-  //               }));
-  //           break;
-  //         case SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH:
-  //           state.from.amount &&
-  //             (await ANQContract.methods.approve(
-  //               ANQSwapContract.options.address,
-  //               web3.utils.toWei(web3.utils.toBN(state.from.amount))
-  //             ));
-
-  //           state.output.amount &&
-  //             (await ANQSwapContract.methods
-  //               .swapTokensforExactETH(
-  //                 web3.utils.toWei(web3.utils.toBN(state.output.amount))
-  //               )
-  //               .send({
-  //                 from: accounts[0],
-  //               }));
-  //           break;
-
-  //         default:
-  //           break;
-  //       }
-  //     })();
-  // }, [state.swapType, state.from.amount, state.output.amount, accounts]);
-
   // handle revert tokens
   useDebounce(
     () => {
@@ -323,6 +288,10 @@ const Swap = ({
 
           const amountFromOne = web3.utils.fromWei(numerator.div(denominator));
           setInputAmountForOneOutput(amountFromOne);
+
+          dispatch({
+            type: ACTION.CALCULATE_LOADING_OFF,
+          });
         })();
     },
     1000,
@@ -334,16 +303,16 @@ const Swap = ({
     (amount, prevAmount) => {
       let match = handleInputPattern(amount);
 
-      dispatch({
-        type: ACTION.SET_SWAP_TYPE,
-        payload:
-          state.input.symbol === "ETH"
-            ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
-            : SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH,
-      });
-
       match !== null &&
         (() => {
+          dispatch({
+            type: ACTION.SET_SWAP_TYPE,
+            payload:
+              state.input.symbol === "ETH"
+                ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
+                : SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH,
+          });
+
           dispatch({
             type: ACTION.INPUT_SET_AMOUNT,
             payload: match,
@@ -357,16 +326,16 @@ const Swap = ({
     (amount, prevAmount) => {
       let match = handleInputPattern(amount);
 
-      dispatch({
-        type: ACTION.SET_SWAP_TYPE,
-        payload:
-          state.input.symbol === "ETH"
-            ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
-            : SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH,
-      });
-
       match !== null &&
         (() => {
+          dispatch({
+            type: ACTION.SET_SWAP_TYPE,
+            payload:
+              state.input.symbol === "ETH"
+                ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
+                : SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH,
+          });
+
           dispatch({
             type: ACTION.OUTPUT_SET_AMOUNT,
             payload: match,
@@ -380,9 +349,6 @@ const Swap = ({
   useDebounce(
     () => {
       state.lock && dispatch({ type: ACTION.LOCK_OFF });
-      // dispatch({
-      //   type: ACTION.LOADING_OFF,
-      // });
     },
     1100,
     [state.lock]
@@ -417,7 +383,7 @@ const Swap = ({
           });
           dispatch({ type: ACTION.LOCK_ON });
           dispatch({
-            type: ACTION.LOADING_OFF,
+            type: ACTION.REVERT_LOADING_OFF,
           });
         })();
     },
@@ -459,7 +425,7 @@ const Swap = ({
           });
           dispatch({ type: ACTION.LOCK_ON });
           dispatch({
-            type: ACTION.LOADING_OFF,
+            type: ACTION.REVERT_LOADING_OFF,
           });
         })();
     },
@@ -468,9 +434,9 @@ const Swap = ({
   );
 
   return (
-    <div className="flex items-center justify-center w-max backdrop-blur  bg-zinc-900 rounded-xl my-5">
+    <div className="relative flex items-center justify-center w-max bg-zinc-900 rounded-xl my-5">
       <div className="h-full w-full p-4 text-base">
-        {state.loading && (
+        {state.revertLoading && (
           <div className="flex items-center justify-center absolute top-0 left-0 h-full w-full bg-zinc-900/90 rounded-xl z-50">
             Loading...
           </div>
@@ -505,6 +471,7 @@ const Swap = ({
           inputPriceUSD={state.input.priceUSD}
           outputPriceUSD={state.output.priceUSD}
           inputAmountForOneOutput={inputAmountForOneOutput}
+          calculatePriceLoading={state.calculatePriceLoading}
         />
         <div className="flex justify-center flex-col py-2 gap-2">
           <Button onClick={accounts ? handleSwap : connectWallet}>
