@@ -9,6 +9,7 @@ import Button from "./Button";
 import InputFrom from "./InputFrom";
 import InputTo from "./InputTo";
 import PredirectFromOneInfo from "./PredirectFromOneInfo";
+import { ReactComponent as Metamask } from "../assets/metamask.svg";
 
 const ACTION = {
   INPUT_SET_BALANCE: "INPUT_SET_BALANCE",
@@ -361,6 +362,7 @@ const Swap = ({
   useDebounce(
     async () => {
       !state.lock &&
+        web3 &&
         (async () => {
           const eth =
             state.input.symbol === "ETH"
@@ -398,6 +400,7 @@ const Swap = ({
   useDebounce(
     async () => {
       !state.lock &&
+        web3 &&
         (async () => {
           const eth =
             state.input.symbol === "ETH"
@@ -499,11 +502,10 @@ const Swap = ({
             </svg>
           </Button>
         </div>
-        <ModalConnectWallet title="Connect wallet ">
-          If you want to use swap, first connect your MetaMask to swap 🦊.
-
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, vel adipisci dolores laborum labore ipsa autem ad? Quia velit quos quod distinctio explicabo aut pariatur perspiciatis accusamus a. Amet, iusto.
-          Est quos qui ab ad sint numquam accusantium eaque hic, aut veniam, obcaecati maxime quam repellat necessitatibus aperiam magni perspiciatis accusamus dolor autem nihil ipsum minima pariatur, laboriosam magnam! Iusto.
+        <ModalConnectWallet title="Connect wallet" showTime={3000}>
+          If you want to use swap, first connect your MetaMask to swap and see
+          predirect price for tokens.
+          <Metamask className="w-1/2 mx-auto" />
         </ModalConnectWallet>
       </div>
     </div>
