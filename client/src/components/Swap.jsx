@@ -302,7 +302,8 @@ const Swap = ({
   // TODO combine two function to one to update amount (check from triger and call right dispatch)
   const handleInputAmount = useCallback(
     (amount, prevAmount) => {
-      let match = handleInputPattern(amount);
+      const match = handleInputPattern(amount);
+      !web3 && setModalConnectWallet(true);
 
       match !== null &&
         (() => {
@@ -320,12 +321,13 @@ const Swap = ({
           });
         })();
     },
-    [state.input.symbol]
+    [state.input.symbol, web3]
   );
 
   const handleOutputAmount = useCallback(
     (amount, prevAmount) => {
-      let match = handleInputPattern(amount);
+      const match = handleInputPattern(amount);
+      !web3 && setModalConnectWallet(true);
 
       match !== null &&
         (() => {
@@ -343,7 +345,7 @@ const Swap = ({
           });
         })();
     },
-    [state.input.symbol]
+    [state.input.symbol, web3]
   );
 
   // to unlock for a short time (lock is to prevent infinity loop)
@@ -434,7 +436,7 @@ const Swap = ({
     [state.output.amount, state.input.symbol]
   );
 
-  const [Modal, setModal] = useModal();
+  const [ModalConnectWallet, setModalConnectWallet] = useModal();
 
   return (
     <div className="relative flex items-center justify-center w-max bg-zinc-900 rounded-xl my-5">
@@ -497,8 +499,12 @@ const Swap = ({
             </svg>
           </Button>
         </div>
-      <Modal>Działa ! Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis dolorem accusamus placeat excepturi sapiente beatae neque, voluptatem debitis a culpa. Nobis sequi inventore reprehenderit possimus quo fugiat consectetur nemo quas.
-      Officiis, voluptatem. Reprehenderit provident asperiores voluptatum fugiat numquam aspernatur! Laborum consequuntur quaerat consectetur esse eius aperiam, dolorem amet sunt, inventore distinctio exercitationem alias! Possimus magni sapiente sequi explicabo dolorum odio!</Modal>
+        <ModalConnectWallet title="Connect wallet ">
+          If you want to use swap, first connect your MetaMask to swap 🦊.
+
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, vel adipisci dolores laborum labore ipsa autem ad? Quia velit quos quod distinctio explicabo aut pariatur perspiciatis accusamus a. Amet, iusto.
+          Est quos qui ab ad sint numquam accusantium eaque hic, aut veniam, obcaecati maxime quam repellat necessitatibus aperiam magni perspiciatis accusamus dolor autem nihil ipsum minima pariatur, laboriosam magnam! Iusto.
+        </ModalConnectWallet>
       </div>
     </div>
   );
