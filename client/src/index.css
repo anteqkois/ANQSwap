@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components{
+
+  .flex-center{
+    @apply flex justify-center items-center;
+  }
+}
+
 @layer utilities {
   .tooltip {
     display: inline;

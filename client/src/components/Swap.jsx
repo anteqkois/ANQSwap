@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useReducer, useCallback } from "react";
 import useDebounce from "../hooks/useDebounce";
 import useModal from "../hooks/useModal";
+import useAlert from "../hooks/useAlert";
 import {
   handleInputPattern,
   handleOutputPattern,
@@ -166,6 +167,8 @@ const Swap = ({
   const [inputAmountForOneOutput, setInputAmountForOneOutput] = useState("");
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [ModalConnectWallet, setModalConnectWallet] = useModal();
+  const [Alert, setAlert] = useAlert();
 
   // update reducer state, get ETH price in USD from coingecko API and set price 1 ANQ
   useEffect(() => {
@@ -439,7 +442,8 @@ const Swap = ({
     [state.output.amount, state.input.symbol]
   );
 
-  const [ModalConnectWallet, setModalConnectWallet] = useModal();
+  //TODO add readOnly mode with infura etc.
+
 
   return (
     <div className="relative flex items-center justify-center w-max bg-zinc-900 rounded-xl my-5">
@@ -502,10 +506,29 @@ const Swap = ({
             </svg>
           </Button>
         </div>
+        <Alert type="success" showTime={3000}>
+          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda
+          recusandae hic veniam laboriosam, necessitatibus commodi iure nam
+          consequuntur sapiente cumque exercitationem sunt animi nulla impedit
+          dignissimos. Porro amet itaque aliquid!
+        </Alert>
         <ModalConnectWallet title="Connect wallet" showTime={3000}>
           If you want to use swap, first connect your MetaMask to swap and see
           predirect price for tokens.
           <Metamask className="w-1/2 mx-auto" />
+          <Button
+            className="block mx-auto"
+            onClick={
+              !accounts
+                ? () => {
+                    connectWallet();
+                    setModalConnectWallet(false);
+                  }
+                : null
+            }
+          >
+            {accounts ? "Wallet was connected" : "Connect wallet"}
+          </Button>
         </ModalConnectWallet>
       </div>
     </div>

@@ -35,7 +35,7 @@ function useModal() {
             className="p-4 w-fit max-w-xl text-slate-100 bg-zinc-900 border border-zinc-800 rounded-xl z-150"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-4">
+            <div className="flex items-end justify-between gap-4 pb-4">
               <h1 className="text-xl font-bold text-slate-50">{title}</h1>
               <span
                 className="relative p-5 cursor-pointer z-200"
