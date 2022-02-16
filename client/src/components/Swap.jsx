@@ -11,6 +11,7 @@ import InputFrom from "./InputFrom";
 import InputTo from "./InputTo";
 import PredirectFromOneInfo from "./PredirectFromOneInfo";
 import { ReactComponent as Metamask } from "../assets/metamask.svg";
+import CopyToClipboard from "./utils/CopyToClipboard";
 
 const ACTION = {
   INPUT_SET_BALANCE: "INPUT_SET_BALANCE",
@@ -597,28 +598,32 @@ const Swap = ({
           </Button>
         </div>
         <TransationModal title="Transation details">
-          <div className="flex flex-col gap-2">
-            <div>
+          <div className="flex flex-col gap-3 ">
+            <div className="border-y-2 py-2 border-zinc-400 border-opacity-40">
               <h4 className="text-lg font-semibold leading-4">
                 Transation hash:
               </h4>
               <p className="text-zinc-400">{transation.transactionHash}</p>
+              <CopyToClipboard copyData={transation.transactionHash} />
             </div>
-            <div>
+            <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
               <h4 className="text-lg font-semibold leading-4">Block hash:</h4>
               <p className="text-zinc-400">{transation.blockHash}</p>
+              <CopyToClipboard copyData={transation.blockHash} />
             </div>
-            <div>
+            <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
               <h4 className="text-lg font-semibold leading-4">Block number:</h4>
               <p className="text-zinc-400">{transation.blockNumber}</p>
             </div>
-            <div>
+            <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
               <h4 className="text-lg font-semibold leading-4">From:</h4>
               <p className="text-zinc-400">{transation.from}</p>
+              <CopyToClipboard copyData={transation.from} />
             </div>
-            <div>
+            <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
               <h4 className="text-lg font-semibold leading-4">To:</h4>
               <p className="text-zinc-400">{transation.to}</p>
+              <CopyToClipboard copyData={transation.to} />
             </div>
             <div>
               <h4 className="text-lg font-semibold leading-4">Used Gas:</h4>

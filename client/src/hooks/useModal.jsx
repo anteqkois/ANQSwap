@@ -22,7 +22,7 @@ function useModal() {
     [showModal]
   );
 
-  const Modal = ({ children, title, showTime }) => {
+  const Modal = ({ children, title, showTime, className }) => {
     time.current = showTime;
 
     return createPortal(
@@ -36,7 +36,7 @@ function useModal() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-end justify-between gap-4 pb-4">
-              <h1 className="text-xl font-bold text-slate-50 underline decoration-[3px] decoration-fuchsia-500">
+              <h1 className="text-2xl font-bold text-slate-50 underline decoration-[3px] decoration-fuchsia-500">
                 {title}
               </h1>
               <span
