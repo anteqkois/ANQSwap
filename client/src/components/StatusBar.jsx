@@ -16,7 +16,7 @@ const StatusBar = ({ account, connectWallet }) => {
         <p>Wallet address:</p>
         <strong className="text-sm md:text-lg"> {account}</strong>
       </div>
-      <Button onClick={!account !== "0x" ? connectWallet : null}>
+      <Button type="special" onClick={!account !== "0x" ? connectWallet : null}>
         {account !== "0x" ? "Wallet was connected" : "Connect wallet"}
       </Button>
     </div>

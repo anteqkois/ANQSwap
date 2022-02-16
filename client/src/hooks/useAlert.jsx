@@ -3,19 +3,26 @@ import { createPortal } from "react-dom";
 import useDebounce from "./useDebounce";
 
 function useAlert() {
-  const [showAlert, setShowAlert] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
 
-const time = useRef(0);
-useDebounce(
-  () => {
-    time.current && setShowAlert(false);
-  },
-  time.current,
-  [showAlert]
-);
+  const time = useRef(0);
+  useDebounce(
+    () => {
+      time.current && setShowAlert(false);
+    },
+    time.current,
+    [showAlert]
+  );
 
-  const Alert = ({ children, title, type, showTime, closeButton, className }) => {
-     time.current = showTime;
+  const Alert = ({
+    children,
+    title,
+    type = 'alert',
+    showTime,
+    closeButton,
+    className,
+  }) => {
+    time.current = showTime;
 
     return createPortal(
       showAlert && (
@@ -23,7 +30,7 @@ useDebounce(
           className={(() => {
             let result = `${className} fixed right-4 bottom-4 p-4 w-fit max-w-xs text-slate-100 bg-zinc-900 border-2 `;
             switch (type) {
-              case "alert":
+              case "error":
                 result += `border-red-500 rounded-xl sm:max-w-xl z-150`;
                 break;
               case "success":
@@ -38,12 +45,12 @@ useDebounce(
           })()}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-end justify-between gap-4 pb-4">
+          <div className="flex items-end justify-between gap-4 pb-3">
             <h1
               className={(() => {
                 let result = `font-bold text-xl first-letter:uppercase `;
                 switch (type) {
-                  case "alert":
+                  case "error":
                     result += `text-red-500`;
                     break;
                   case "success":
@@ -64,14 +71,14 @@ useDebounce(
                 className={(() => {
                   let result = `relative p-4 cursor-pointer z-200 rounded-lg `;
                   switch (type) {
-                    case "alert":
+                    case "error":
                       result += `bg-red-500`;
                       break;
                     case "success":
                       result += `bg-green-600`;
                       break;
                     default:
-                      result += `bg-red-500`;
+                      result += `bg-zinc-700`;
                       break;
                   }
                   return result;

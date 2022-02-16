@@ -167,8 +167,8 @@ const Swap = ({
   const [inputAmountForOneOutput, setInputAmountForOneOutput] = useState("");
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [ModalConnectWallet, setModalConnectWallet] = useModal();
-  const [Alert, setAlert] = useAlert();
+  // const [ModalConnectWallet, setModalConnectWallet] = useModal();
+  const [AlertConnectWallet, setAlertConnectWallet] = useAlert();
 
   // update reducer state, get ETH price in USD from coingecko API and set price 1 ANQ
   useEffect(() => {
@@ -307,8 +307,7 @@ const Swap = ({
   const handleInputAmount = useCallback(
     (amount, prevAmount) => {
       const match = handleInputPattern(amount);
-      !web3 && setModalConnectWallet(true);
-
+      !web3 && setAlertConnectWallet(true);
       match !== null &&
         (() => {
           dispatch({
@@ -331,7 +330,7 @@ const Swap = ({
   const handleOutputAmount = useCallback(
     (amount, prevAmount) => {
       const match = handleInputPattern(amount);
-      !web3 && setModalConnectWallet(true);
+      !web3 && setAlertConnectWallet(true);
 
       match !== null &&
         (() => {
@@ -444,7 +443,6 @@ const Swap = ({
 
   //TODO add readOnly mode with infura etc.
 
-
   return (
     <div className="relative flex items-center justify-center w-max bg-zinc-900 rounded-xl my-5">
       <div className="h-full w-full p-4 text-base">
@@ -485,7 +483,7 @@ const Swap = ({
           inputAmountForOneOutput={inputAmountForOneOutput}
           calculatePriceLoading={state.calculatePriceLoading}
         />
-        <div className="flex justify-center flex-col py-2 gap-2">
+        <div className="flex justify-center flex-col py-2 gap-3">
           <Button onClick={accounts ? handleSwap : connectWallet}>
             {accounts ? "swap" : "connect wallet"}
           </Button>
@@ -506,13 +504,25 @@ const Swap = ({
             </svg>
           </Button>
         </div>
-        <Alert type="success" showTime={3000}>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Assumenda
-          recusandae hic veniam laboriosam, necessitatibus commodi iure nam
-          consequuntur sapiente cumque exercitationem sunt animi nulla impedit
-          dignissimos. Porro amet itaque aliquid!
-        </Alert>
-        <ModalConnectWallet title="Connect wallet" showTime={3000}>
+        <AlertConnectWallet type="error" title="Connect wallet">
+          If you want to use swap, first connect your MetaMask to swap and see
+          predirect price for tokens.
+          {/* <Metamask className="w-1/5 mx-auto" /> */}
+          <Button
+            className="block mt-4"
+            onClick={
+              !accounts
+                ? () => {
+                    connectWallet();
+                    setAlertConnectWallet(false);
+                  }
+                : null
+            }
+          >
+            {accounts ? "Wallet was connected" : "Connect wallet"}
+          </Button>
+        </AlertConnectWallet>
+        {/* <ModalConnectWallet title="Connect wallet" showTime={3000}>
           If you want to use swap, first connect your MetaMask to swap and see
           predirect price for tokens.
           <Metamask className="w-1/2 mx-auto" />
@@ -529,7 +539,7 @@ const Swap = ({
           >
             {accounts ? "Wallet was connected" : "Connect wallet"}
           </Button>
-        </ModalConnectWallet>
+        </ModalConnectWallet> */}
       </div>
     </div>
   );
