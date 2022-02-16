@@ -5,7 +5,8 @@ import Web3 from "web3";
 import StatusBar from "./components/StatusBar";
 import Swap from "./components/Swap";
 import useAlert from "./hooks/useAlert";
-import Button from './components/Button';
+import Button from "./components/Button";
+import { testNetwork, rinkeby, BinanceSmartChian } from "./constants/chains";
 
 export const App = () => {
   const [web3, setWeb3] = useState(null);
@@ -14,6 +15,32 @@ export const App = () => {
   const [ANQContract, setANQContract] = useState(null);
 
   const [AlertWrongNetwork, setAlertWrongNetwork] = useAlert();
+
+  const handleChangeNetwork = async () => {
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: `0x${Number(4).toString(16)}` }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                ...rinkeby,
+              },
+            ],
+          });
+        } catch (addError) {
+          // handle "add" error
+        }
+      }
+      // handle other "switch" errors
+    }
+  };
 
   const handleConnect = async () => {
     try {
@@ -27,7 +54,7 @@ export const App = () => {
       //TODO in future use rinkeby network (4)
       const networkId = await web3.eth.net.getId();
 
-      networkId !== 577 && setAlertWrongNetwork(true);
+      // networkId !== 577 && setAlertWrongNetwork(true);
 
       setANQSwapContract(
         new web3.eth.Contract(ANQSwap.abi, ANQSwap.networks[networkId].address)
@@ -61,8 +88,10 @@ export const App = () => {
         />
       </div>
       <AlertWrongNetwork>
-        You use wrong network. Switch to your private test network !
-        <Button type="minimalist" onClick={()=>{}}>Switch network to private</Button>
+        You use wrong network. Switch to Rinkeby network !
+        <Button type="minimalist" onClick={handleChangeNetwork}>
+          Switch to Rinkeby network
+        </Button>
       </AlertWrongNetwork>
     </div>
   );

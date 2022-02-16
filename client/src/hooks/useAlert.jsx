@@ -17,7 +17,7 @@ function useAlert() {
   const Alert = ({
     children,
     title,
-    type = 'alert',
+    type = "alert",
     showTime,
     closeButton,
     className,
@@ -28,13 +28,16 @@ function useAlert() {
       showAlert && (
         <div
           className={(() => {
-            let result = `${className} fixed right-4 bottom-4 p-4 w-fit max-w-xs text-slate-100 bg-zinc-900 border-2 `;
+            let result = `${className} fixed right-6 bottom-6 p-4 w-fit max-w-xs text-slate-100 bg-zinc-900 border-2 `;
             switch (type) {
               case "error":
                 result += `border-red-500 rounded-xl sm:max-w-xl z-150`;
                 break;
+              case "alert":
+                result += `border-orange-500 rounded-xl sm:max-w-xl z-150`;
+                break;
               case "success":
-                result += `border-green-600 rounded-xl sm:max-w-xl z-150`;
+                result += `border-green-500 rounded-xl sm:max-w-xl z-150`;
                 break;
 
               default:
@@ -53,8 +56,11 @@ function useAlert() {
                   case "error":
                     result += `text-red-500`;
                     break;
+                  case "alert":
+                    result += `text-orange-500`;
+                    break;
                   case "success":
-                    result += ` text-green-600`;
+                    result += ` text-green-500`;
                     break;
 
                   default:
@@ -74,8 +80,11 @@ function useAlert() {
                     case "error":
                       result += `bg-red-500`;
                       break;
+                    case "alert":
+                      result += `bg-orange-500`;
+                      break;
                     case "success":
-                      result += `bg-green-600`;
+                      result += `bg-green-500`;
                       break;
                     default:
                       result += `bg-zinc-700`;
@@ -90,6 +99,7 @@ function useAlert() {
               </span>
             )}
           </div>
+          {typeof showAlert === "string" && showAlert}
           {children}
         </div>
       ),

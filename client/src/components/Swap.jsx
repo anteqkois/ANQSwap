@@ -157,6 +157,77 @@ const initialState = {
   calculatePriceLoading: false,
 };
 
+const testTransation = {
+  transactionHash:
+    "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+  transactionIndex: 0,
+  blockHash:
+    "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+  blockNumber: 290,
+  from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+  to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
+  gasUsed: 53756,
+  cumulativeGasUsed: 53756,
+  contractAddress: null,
+  status: true,
+  logsBloom:
+    "0x00000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000004000100000000000000008000000000000000000000000000000000180400000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000040040080000000000008000000000000010000000000000000000000000000000000000000000000000000000000000100000000000002000000000400000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000400000000",
+  events: {
+    0: {
+      logIndex: 0,
+      transactionIndex: 0,
+      transactionHash:
+        "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+      blockHash:
+        "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+      blockNumber: 290,
+      address: "0x437f422B6D48F980778F5Fe53D87c5AeE89Ac289",
+      type: "mined",
+      id: "log_d8c26cd4",
+      returnValues: {},
+      signature: null,
+      raw: {
+        data: "0x000000000000000000000000000000000000000000000000004407316a5ab0ad",
+        topics: [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x00000000000000000000000091291b1bc31adb17c3104372a8e5cf1944215e80",
+          "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+        ],
+      },
+    },
+    BuyTokens: {
+      logIndex: 1,
+      transactionIndex: 0,
+      transactionHash:
+        "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+      blockHash:
+        "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+      blockNumber: 290,
+      address: "0x91291B1BC31adb17c3104372A8e5cf1944215E80",
+      type: "mined",
+      id: "log_2b49816b",
+      returnValues: {
+        0: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
+        1: "10000000000000",
+        2: "19148207235444909",
+        _buyer: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
+        _amountETH: "10000000000000",
+        _amountANQ: "19148207235444909",
+      },
+      event: "BuyTokens",
+      signature:
+        "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
+      raw: {
+        data: "0x000000000000000000000000000000000000000000000000000009184e72a000000000000000000000000000000000000000000000000000004407316a5ab0ad",
+        topics: [
+          "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
+          "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+        ],
+      },
+    },
+  },
+};
+
 const Swap = ({
   accounts,
   web3,
@@ -165,13 +236,19 @@ const Swap = ({
   connectWallet,
 }) => {
   const [inputAmountForOneOutput, setInputAmountForOneOutput] = useState("");
+  const [transation, setTransation] = useState(testTransation);
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  // const [ModalConnectWallet, setModalConnectWallet] = useModal();
+
+  const [TransationModal, setTransationModal] = useModal();
+
   const [AlertConnectWallet, setAlertConnectWallet] = useAlert();
+  const [AlertUniversal, setAlertUniversal] = useAlert();
+  const [AlertConfirmation, setAlertConfirmation] = useAlert();
 
   // update reducer state, get ETH price in USD from coingecko API and set price 1 ANQ
   useEffect(() => {
+    setTransationModal(true);
     accounts &&
       (async () => {
         dispatch({
@@ -212,50 +289,65 @@ const Swap = ({
   }, [ANQContract, ANQSwapContract, accounts, web3]);
 
   const handleSwap = async () => {
-    switch (state.swapType) {
-      case SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS:
-        state.input.amount &&
-          (await ANQSwapContract.methods.swapExactETHForTokens().send({
-            from: accounts[0],
-            value: web3.utils.toWei(state.input.amount),
-          }));
-        break;
-      case SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH:
-        state.input.amount &&
-          (await ANQContract.methods
-            .approve(
-              ANQSwapContract.options.address,
-              web3.utils.toWei(state.input.amount)
-            )
-            .send({ from: accounts[0] }));
+    !state.input.amount || !state.output.amount
+      ? setAlertUniversal("Type amount of tokens to swap form")
+      : (async () => {
+          switch (state.swapType) {
+            case SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS:
+              await ANQSwapContract.methods
+                .swapExactETHForTokens()
+                .send({
+                  from: accounts[0],
+                  value: web3.utils.toWei(state.input.amount),
+                })
+                .on("receipt", (receipt) => {
+                  console.log(receipt.toString());
+                  console.log(JSON.stringify(receipt));
+                })
+                .on("confirmation", (confirmationNumber, receipt) => {
+                  setAlertConfirmation(
+                    `Your transation have ${confirmationNumber} confirmation !`
+                  );
+                })
+                .on("error", (error, receipt) => {
+                  console.log({ error, receipt });
+                });
+              break;
+            case SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH:
+              await ANQContract.methods
+                .approve(
+                  ANQSwapContract.options.address,
+                  web3.utils.toWei(state.input.amount)
+                )
+                .send({ from: accounts[0] });
 
-        state.input.amount &&
-          (await ANQSwapContract.methods
-            .swapExactTokensforETH(web3.utils.toWei(state.input.amount))
-            .send({
-              from: accounts[0],
-            }));
-        break;
-      case SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH:
-        state.input.amount &&
-          (await ANQContract.methods
-            .approve(
-              ANQSwapContract.options.address,
-              web3.utils.toWei(state.input.amount)
-            )
-            .send({ from: accounts[0] }));
+              await ANQSwapContract.methods
+                .swapExactTokensforETH(web3.utils.toWei(state.input.amount))
+                .send({
+                  from: accounts[0],
+                });
+              break;
+            case SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH:
+              await ANQContract.methods
+                .approve(
+                  ANQSwapContract.options.address,
+                  web3.utils.toWei(state.input.amount)
+                )
+                .send({ from: accounts[0] });
 
-        state.output.amount &&
-          (await ANQSwapContract.methods
-            .swapTokensforExactETH(web3.utils.toWei(state.output.amount))
-            .send({
-              from: accounts[0],
-            }));
-        break;
-
-      default:
-        break;
-    }
+              await ANQSwapContract.methods
+                .swapTokensforExactETH(web3.utils.toWei(state.output.amount))
+                .send({
+                  from: accounts[0],
+                });
+              break;
+            default:
+              setAlertUniversal(
+                "Something went wrong :( Try do swap tokens again or wait a while."
+              );
+              break;
+          }
+        })();
   };
 
   // handle revert tokens
@@ -504,42 +596,55 @@ const Swap = ({
             </svg>
           </Button>
         </div>
-        <AlertConnectWallet type="error" title="Connect wallet">
+        <TransationModal title="Transation details">
+          <div className="flex flex-col gap-2">
+            <div>
+              <h4 className="text-lg font-semibold leading-4">
+                Transation hash:
+              </h4>
+              <p className="text-zinc-400">{transation.transactionHash}</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold leading-4">Block hash:</h4>
+              <p className="text-zinc-400">{transation.blockHash}</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold leading-4">Block number:</h4>
+              <p className="text-zinc-400">{transation.blockNumber}</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold leading-4">From:</h4>
+              <p className="text-zinc-400">{transation.from}</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold leading-4">To:</h4>
+              <p className="text-zinc-400">{transation.to}</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold leading-4">Used Gas:</h4>
+              <p className="text-zinc-400">{transation.gasUsed}</p>
+            </div>
+          </div>
+        </TransationModal>
+        <AlertConnectWallet type="alert" title="Connect wallet">
           If you want to use swap, first connect your MetaMask to swap and see
           predirect price for tokens.
-          {/* <Metamask className="w-1/5 mx-auto" /> */}
           <Button
-            className="block mt-4"
-            onClick={
-              !accounts
-                ? () => {
-                    connectWallet();
-                    setAlertConnectWallet(false);
-                  }
-                : null
-            }
+            type="minimalist"
+            onClick={() => {
+              connectWallet();
+              setAlertConnectWallet(false);
+            }}
           >
-            {accounts ? "Wallet was connected" : "Connect wallet"}
+            connect wallet
           </Button>
         </AlertConnectWallet>
-        {/* <ModalConnectWallet title="Connect wallet" showTime={3000}>
-          If you want to use swap, first connect your MetaMask to swap and see
-          predirect price for tokens.
-          <Metamask className="w-1/2 mx-auto" />
-          <Button
-            className="block mx-auto"
-            onClick={
-              !accounts
-                ? () => {
-                    connectWallet();
-                    setModalConnectWallet(false);
-                  }
-                : null
-            }
-          >
-            {accounts ? "Wallet was connected" : "Connect wallet"}
-          </Button>
-        </ModalConnectWallet> */}
+        <AlertUniversal type="alert" showTime={3000} />
+        <AlertConfirmation
+          type="success"
+          title="Confirmation"
+          showTime={3000}
+        />
       </div>
     </div>
   );
