@@ -19,7 +19,7 @@ const InputTo = ({ balance, coinAmount, setCoinAmount, symbol }) => {
           name="anqAmount"
           id="anqAmount"
           placeholder="0"
-          className="p-4 pr-16 text-right w-full h-full bg-transparent focus:outline-none"
+          className="p-4 pr-16 text-right w-full h-full bg-transparent caret-slate-50 focus:outline-none"
         />
         <span className="absolute right-4 top-1/2 -translate-y-1/2">
           {symbol}

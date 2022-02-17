@@ -19,7 +19,7 @@ const InputFrom = ({ balance, coinAmount, setCoinAmount, symbol, valueOfAmount }
           name="ethAmount"
           id="ethAmount"
           placeholder="0"
-          className=" p-4 pr-16 pb-8 text-right w-full h-full bg-transparent focus:outline-none"
+          className=" p-4 pr-16 pb-8 text-right w-full h-full bg-transparent caret-slate-50 focus:outline-none"
         />
         <span className="absolute right-4 pt-2">{symbol}</span>
         <p className="p-0.5 px-4 text-right text-sm text-slate-400 absolute bottom-1 right-1">

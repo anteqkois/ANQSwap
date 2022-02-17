@@ -10,10 +10,10 @@ const CopyToClipboard = ({ onClick, copyData }) => {
 
   return (
     <span
-      className="underline decoration-2 decoration-zinc-300 cursor-pointer"
+      className="text-zinc-300 decoration-zinc-400 cursor-pointer group hover:underline hover:decoration-2 hover:decoration-zinc-300 hover:text-zinc-50"
       onClick={handleClick}
     >
-      <Copy className="inline-block mr-1 stroke-zinc-400 fill-zinc-400" />
+      <Copy className="inline-block mr-1 stroke-zinc-400 fill-zinc-400 group-hover:stroke-zinc-300 group-hover:fill-zinc-300" />
       copy
     </span>
   );

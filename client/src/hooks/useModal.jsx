@@ -22,8 +22,13 @@ function useModal() {
     [showModal]
   );
 
-  const Modal = ({ children, title, showTime, className }) => {
+  const Modal = ({ children, title, showTime, className, onClose }) => {
     time.current = showTime;
+
+    const handleClose = () => {
+      onClose();
+      setShowModal(false);
+    };
 
     return createPortal(
       showModal && (
@@ -40,8 +45,8 @@ function useModal() {
                 {title}
               </h1>
               <span
-                className="relative p-4 cursor-pointer z-200 rounded-lg bg-zinc-700"
-                onClick={() => setShowModal(false)}
+                className="relative p-4 cursor-pointer z-200 rounded-lg bg-zinc-700 hover:bg-zinc-600"
+                onClick={handleClose}
               >
                 <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-45 w-0.5 h-6 rounded bg-zinc-900"></span>
                 <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 w-0.5 h-6 rounded bg-zinc-900"></span>

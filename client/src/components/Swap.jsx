@@ -2,16 +2,18 @@ import React, { useState, useEffect, useReducer, useCallback } from "react";
 import useDebounce from "../hooks/useDebounce";
 import useModal from "../hooks/useModal";
 import useAlert from "../hooks/useAlert";
+import useQuickAlertContext from "./../hooks/UseQuickAlerContext";
 import {
   handleInputPattern,
   handleOutputPattern,
 } from "../helpers/amountPattern";
+
 import Button from "./Button";
 import InputFrom from "./InputFrom";
 import InputTo from "./InputTo";
 import PredirectFromOneInfo from "./PredirectFromOneInfo";
-import { ReactComponent as Metamask } from "../assets/metamask.svg";
 import CopyToClipboard from "./utils/CopyToClipboard";
+import { ReactComponent as Metamask } from "../assets/metamask.svg";
 
 const ACTION = {
   INPUT_SET_BALANCE: "INPUT_SET_BALANCE",
@@ -242,6 +244,8 @@ const Swap = ({
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const [TransationModal, setTransationModal] = useModal();
+
+  const handleQuickAlert = useQuickAlertContext();
 
   const [AlertConnectWallet, setAlertConnectWallet] = useAlert();
   const [AlertUniversal, setAlertUniversal] = useAlert();
@@ -597,7 +601,19 @@ const Swap = ({
             </svg>
           </Button>
         </div>
-        <TransationModal title="Transation details">
+        {/* TODO Add to separate component */}
+        {/* TODO Add quick alert component ? */}
+        <TransationModal
+          title="Transation details"
+          onClose={() =>
+            handleQuickAlert({
+              title: "Thanks for use ANQSwap",
+              message:
+                "We happy that you decided to use our swap. See next time ;)",
+              showTime: 3000,
+            })
+          }
+        >
           <div className="flex flex-col gap-3 ">
             <div className="border-y-2 py-2 border-zinc-400 border-opacity-40">
               <h4 className="text-lg font-semibold leading-4">

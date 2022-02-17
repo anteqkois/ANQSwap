@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import ANQSwap from "./contracts/ANQSwap.json";
 import AnteqToken from "./contracts/AnteqToken.json";
 import Web3 from "web3";
+
+import { testNetwork, rinkeby, BinanceSmartChian } from "./constants/chains";
+import { QuickAlertProvider } from "./hooks/UseQuickAlerContext";
+import useAlert from "./hooks/useAlert";
+
 import StatusBar from "./components/StatusBar";
 import Swap from "./components/Swap";
-import useAlert from "./hooks/useAlert";
 import Button from "./components/Button";
-import { testNetwork, rinkeby, BinanceSmartChian } from "./constants/chains";
 
 export const App = () => {
   const [web3, setWeb3] = useState(null);
@@ -76,24 +79,26 @@ export const App = () => {
   };
 
   return (
-    <div className="w-screen p-4 flex flex-col h-screen bg-zinc-800 text-slate-300">
-      <StatusBar account={accounts} connectWallet={handleConnect}></StatusBar>
-      <div className=" flex items-center justify-center md:h-3/4">
-        <Swap
-          web3={web3}
-          accounts={accounts}
-          ANQSwapContract={ANQSwapContract}
-          ANQContract={ANQContract}
-          connectWallet={handleConnect}
-        />
+    <QuickAlertProvider>
+      <div className="w-screen p-4 flex flex-col h-screen bg-zinc-800 text-slate-300">
+        <StatusBar account={accounts} connectWallet={handleConnect}></StatusBar>
+        <div className=" flex items-center justify-center md:h-3/4">
+          <Swap
+            web3={web3}
+            accounts={accounts}
+            ANQSwapContract={ANQSwapContract}
+            ANQContract={ANQContract}
+            connectWallet={handleConnect}
+          />
+        </div>
+        <AlertWrongNetwork>
+          You use wrong network. Switch to Rinkeby network !
+          <Button type="minimalist" onClick={handleChangeNetwork}>
+            Switch to Rinkeby network
+          </Button>
+        </AlertWrongNetwork>
       </div>
-      <AlertWrongNetwork>
-        You use wrong network. Switch to Rinkeby network !
-        <Button type="minimalist" onClick={handleChangeNetwork}>
-          Switch to Rinkeby network
-        </Button>
-      </AlertWrongNetwork>
-    </div>
+    </QuickAlertProvider>
   );
 };
 
