@@ -159,77 +159,91 @@ const initialState = {
   revertLoading: false,
   calculatePriceLoading: false,
 };
+// const testTransation = {
+//   transactionHash:
+//     "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+//   transactionIndex: 0,
+//   blockHash:
+//     "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+//   blockNumber: 290,
+//   from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+//   to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
+//   gasUsed: 53756,
+//   cumulativeGasUsed: 53756,
+//   contractAddress: null,
+//   status: true,
+//   logsBloom:
+//     "0x00000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000004000100000000000000008000000000000000000000000000000000180400000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000040040080000000000008000000000000010000000000000000000000000000000000000000000000000000000000000100000000000002000000000400000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000400000000",
+//   events: {
+//     0: {
+//       logIndex: 0,
+//       transactionIndex: 0,
+//       transactionHash:
+//         "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+//       blockHash:
+//         "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+//       blockNumber: 290,
+//       address: "0x437f422B6D48F980778F5Fe53D87c5AeE89Ac289",
+//       type: "mined",
+//       id: "log_d8c26cd4",
+//       returnValues: {},
+//       signature: null,
+//       raw: {
+//         data: "0x000000000000000000000000000000000000000000000000004407316a5ab0ad",
+//         topics: [
+//           "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+//           "0x00000000000000000000000091291b1bc31adb17c3104372a8e5cf1944215e80",
+//           "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+//         ],
+//       },
+//     },
+//     BuyTokens: {
+//       logIndex: 1,
+//       transactionIndex: 0,
+//       transactionHash:
+//         "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+//       blockHash:
+//         "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+//       blockNumber: 290,
+//       address: "0x91291B1BC31adb17c3104372A8e5cf1944215E80",
+//       type: "mined",
+//       id: "log_2b49816b",
+//       returnValues: {
+//         0: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
+//         1: "10000000000000",
+//         2: "19148207235444909",
+//         _buyer: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
+//         _amountETH: "10000000000000",
+//         _amountANQ: "19148207235444909",
+//       },
+//       event: "BuyTokens",
+//       signature:
+//         "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
+//       raw: {
+//         data: "0x000000000000000000000000000000000000000000000000000009184e72a000000000000000000000000000000000000000000000000000004407316a5ab0ad",
+//         topics: [
+//           "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
+//           "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+//         ],
+//       },
+//     },
+//   },
+// };
 
-const testTransation = {
-  transactionHash:
-    "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-  transactionIndex: 0,
-  blockHash:
-    "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-  blockNumber: 290,
-  from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-  to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
-  gasUsed: 53756,
-  cumulativeGasUsed: 53756,
-  contractAddress: null,
-  status: true,
-  logsBloom:
-    "0x00000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000004000100000000000000008000000000000000000000000000000000180400000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000040040080000000000008000000000000010000000000000000000000000000000000000000000000000000000000000100000000000002000000000400000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000400000000",
-  events: {
-    0: {
-      logIndex: 0,
-      transactionIndex: 0,
-      transactionHash:
-        "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-      blockHash:
-        "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-      blockNumber: 290,
-      address: "0x437f422B6D48F980778F5Fe53D87c5AeE89Ac289",
-      type: "mined",
-      id: "log_d8c26cd4",
-      returnValues: {},
-      signature: null,
-      raw: {
-        data: "0x000000000000000000000000000000000000000000000000004407316a5ab0ad",
-        topics: [
-          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-          "0x00000000000000000000000091291b1bc31adb17c3104372a8e5cf1944215e80",
-          "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-        ],
-      },
-    },
-    BuyTokens: {
-      logIndex: 1,
-      transactionIndex: 0,
-      transactionHash:
-        "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-      blockHash:
-        "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-      blockNumber: 290,
-      address: "0x91291B1BC31adb17c3104372A8e5cf1944215E80",
-      type: "mined",
-      id: "log_2b49816b",
-      returnValues: {
-        0: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
-        1: "10000000000000",
-        2: "19148207235444909",
-        _buyer: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
-        _amountETH: "10000000000000",
-        _amountANQ: "19148207235444909",
-      },
-      event: "BuyTokens",
-      signature:
-        "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
-      raw: {
-        data: "0x000000000000000000000000000000000000000000000000000009184e72a000000000000000000000000000000000000000000000000000004407316a5ab0ad",
-        topics: [
-          "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
-          "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-        ],
-      },
-    },
-  },
-};
+// const testTransation = {
+//   transactionHash:
+//     "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+//   blockHash:
+//     "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+//   blockNumber: 290,
+//   from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+//   to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
+//   gasUsed: 53756,
+//   fromAmount: web3.utils.fromWei("10000000000000"),
+//   fromSymbol: "ETH",
+//   toAmount: web3.utils.fromWei("19148207235444909"),
+//   toSymbol: "ANQ",
+// };
 
 const Swap = ({
   accounts,
@@ -239,7 +253,7 @@ const Swap = ({
   connectWallet,
 }) => {
   const [inputAmountForOneOutput, setInputAmountForOneOutput] = useState("");
-  const [transation, setTransation] = useState(testTransation);
+  const [transation, setTransation] = useState();
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -249,13 +263,28 @@ const Swap = ({
 
   const [AlertConnectWallet, setAlertConnectWallet] = useAlert();
   const [AlertUniversal, setAlertUniversal] = useAlert();
-  const [AlertConfirmation, setAlertConfirmation] = useAlert();
+  // const [AlertConfirmation, setAlertConfirmation] = useAlert();
 
   // update reducer state, get ETH price in USD from coingecko API and set price 1 ANQ
   useEffect(() => {
-    setTransationModal(true);
     accounts &&
       (async () => {
+        setTransation({
+          transactionHash:
+            "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
+          blockHash:
+            "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
+          blockNumber: 290,
+          from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
+          to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
+          gasUsed: 53756,
+          fromAmount: web3.utils.fromWei("10000000000000"),
+          fromSymbol: "ETH",
+          toAmount: web3.utils.fromWei("19148207235444909"),
+          toSymbol: "ANQ",
+        });
+        setTransationModal(true);
+
         dispatch({
           type: ACTION.INPUT_SET_BALANCE,
           payload: web3.utils.fromWei(await web3.eth.getBalance(accounts[0])),
@@ -305,14 +334,41 @@ const Swap = ({
                   from: accounts[0],
                   value: web3.utils.toWei(state.input.amount),
                 })
-                .on("receipt", (receipt) => {
-                  console.log(receipt.toString());
-                  console.log(JSON.stringify(receipt));
-                })
+                .on(
+                  "receipt",
+                  ({
+                    transactionHash,
+                    blockHash,
+                    blockNumber,
+                    from,
+                    to,
+                    gasUsed,
+                    events,
+                  }) => {
+                    const parseTransationData = {
+                      transactionHash,
+                      blockHash,
+                      blockNumber,
+                      from,
+                      to,
+                      gasUsed,
+                      fromAmount: web3.utils.fromWei(
+                        events.BuyTokens._amountETH
+                      ),
+                      fromSymbol: "ETH",
+                      toAmount: web3.utils.fromWei(events.BuyTokens._amountANQ),
+                      toSymbol: "ANQ",
+                    };
+
+                    setTransation(parseTransationData);
+                  }
+                )
                 .on("confirmation", (confirmationNumber, receipt) => {
-                  setAlertConfirmation(
-                    `Your transation have ${confirmationNumber} confirmation !`
-                  );
+                  handleQuickAlert({
+                    title: "Confirmation",
+                    message: `Your transation have ${confirmationNumber} confirmation !`,
+                    showTime: 3000,
+                  });
                 })
                 .on("error", (error, receipt) => {
                   console.log({ error, receipt });
@@ -616,34 +672,32 @@ const Swap = ({
         >
           <div className="flex flex-col gap-3 ">
             <div className="border-y-2 py-2 border-zinc-400 border-opacity-40">
-              <h4 className="text-lg font-semibold leading-4">
+              <h4 className="text-lg font-semibold leading-5">Swap amount:</h4>
+              <p className="text-zinc-400">
+                {transation?.fromAmount} {transation?.fromSymbol}{" "}
+                <strong className="text-slate-100 ">swap to</strong>{" "}
+                {transation?.toAmount} {transation?.toSymbol}
+              </p>
+            </div>
+            <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
+              <h4 className="text-lg font-semibold leading-5">
                 Transation hash:
               </h4>
-              <p className="text-zinc-400">{transation.transactionHash}</p>
-              <CopyToClipboard copyData={transation.transactionHash} />
+              <p className="text-zinc-400">{transation?.transactionHash}</p>
+              <CopyToClipboard copyData={transation?.transactionHash} />
             </div>
             <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
-              <h4 className="text-lg font-semibold leading-4">Block hash:</h4>
-              <p className="text-zinc-400">{transation.blockHash}</p>
-              <CopyToClipboard copyData={transation.blockHash} />
+              <h4 className="text-lg font-semibold leading-5">Block hash:</h4>
+              <p className="text-zinc-400">{transation?.blockHash}</p>
+              <CopyToClipboard copyData={transation?.blockHash} />
             </div>
             <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
-              <h4 className="text-lg font-semibold leading-4">Block number:</h4>
-              <p className="text-zinc-400">{transation.blockNumber}</p>
-            </div>
-            <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
-              <h4 className="text-lg font-semibold leading-4">From:</h4>
-              <p className="text-zinc-400">{transation.from}</p>
-              <CopyToClipboard copyData={transation.from} />
-            </div>
-            <div className="border-b-2 pb-2 border-zinc-400 border-opacity-40">
-              <h4 className="text-lg font-semibold leading-4">To:</h4>
-              <p className="text-zinc-400">{transation.to}</p>
-              <CopyToClipboard copyData={transation.to} />
+              <h4 className="text-lg font-semibold leading-5">Block number:</h4>
+              <p className="text-zinc-400">{transation?.blockNumber}</p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold leading-4">Used Gas:</h4>
-              <p className="text-zinc-400">{transation.gasUsed}</p>
+              <h4 className="text-lg font-semibold leading-5">Used Gas:</h4>
+              <p className="text-zinc-400">{transation?.gasUsed}</p>
             </div>
           </div>
         </TransationModal>
@@ -661,11 +715,6 @@ const Swap = ({
           </Button>
         </AlertConnectWallet>
         <AlertUniversal type="alert" showTime={3000} />
-        <AlertConfirmation
-          type="success"
-          title="Confirmation"
-          showTime={3000}
-        />
       </div>
     </div>
   );
