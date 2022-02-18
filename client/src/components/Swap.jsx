@@ -2,18 +2,18 @@ import React, { useState, useEffect, useReducer, useCallback } from "react";
 import useDebounce from "../hooks/useDebounce";
 import useModal from "../hooks/useModal";
 import useAlert from "../hooks/useAlert";
-import useQuickAlertContext from "./../hooks/UseQuickAlerContext";
+import useQuickAlert from "../hooks/useQuickAlert";
 import {
   handleInputPattern,
   handleOutputPattern,
 } from "../helpers/amountPattern";
 
-import Button from "./Button";
+import Button from "./utils/Button";
 import InputFrom from "./InputFrom";
 import InputTo from "./InputTo";
 import PredirectFromOneInfo from "./PredirectFromOneInfo";
 import CopyToClipboard from "./utils/CopyToClipboard";
-import { ReactComponent as Metamask } from "../assets/metamask.svg";
+// import { ReactComponent as Metamask } from "../assets/metamask.svg";
 
 const ACTION = {
   INPUT_SET_BALANCE: "INPUT_SET_BALANCE",
@@ -259,7 +259,7 @@ const Swap = ({
 
   const [TransationModal, setTransationModal] = useModal();
 
-  const handleQuickAlert = useQuickAlertContext();
+  const handleQuickAlert = useQuickAlert();
 
   const [AlertConnectWallet, setAlertConnectWallet] = useAlert();
   const [AlertUniversal, setAlertUniversal] = useAlert();
