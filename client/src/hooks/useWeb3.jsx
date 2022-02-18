@@ -68,13 +68,13 @@ export const Web3Provider = ({ children }) => {
         connectWallet: handleConnectWallet,
       }}
     >
+      {children}
       <AlertWrongNetwork>
         You use wrong network. Switch to Rinkeby network !
         <Button type="minimalist" onClick={handleChangeNetwork}>
           Switch to Rinkeby network
         </Button>
       </AlertWrongNetwork>
-      {children}
     </Web3Context.Provider>
   );
 };

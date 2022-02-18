@@ -258,10 +258,11 @@ const Swap = ({
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const [TransationModal, setTransationModal] = useModal();
-
   const handleQuickAlert = useQuickAlert();
 
   const [AlertConnectWallet, setAlertConnectWallet] = useAlert();
+
+  //TODO replace alert universal to quick alert
   const [AlertUniversal, setAlertUniversal] = useAlert();
   // const [AlertConfirmation, setAlertConfirmation] = useAlert();
 
