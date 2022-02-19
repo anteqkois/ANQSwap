@@ -1,12 +1,8 @@
-import React, { useState, useEffect, useReducer, useCallback } from "react";
-import useDebounce from "../hooks/useDebounce";
+import React, { useState } from "react";
 import useModal from "../hooks/useModal";
+import useSwap from "./../hooks/useSwap";
 import useAlert from "../hooks/useAlert";
 import useQuickAlert from "../hooks/useQuickAlert";
-import {
-  handleInputPattern,
-  handleOutputPattern,
-} from "../helpers/amountPattern";
 
 import Button from "./utils/Button";
 import InputFrom from "./InputFrom";
@@ -15,236 +11,6 @@ import PredirectFromOneInfo from "./PredirectFromOneInfo";
 import CopyToClipboard from "./utils/CopyToClipboard";
 // import { ReactComponent as Metamask } from "../assets/metamask.svg";
 
-const ACTION = {
-  INPUT_SET_BALANCE: "INPUT_SET_BALANCE",
-  INPUT_SET_PRICE_USD: "INPUT_SET_PRICE_USD",
-  INPUT_SET_AMOUNT: "INPUT_SET_AMOUNT",
-  INPUT_SET_SYMBOL: "INPUT_SET_SYMBOL",
-  OUTPUT_SET_BALANCE: "OUTPUT_SET_BALANCE",
-  OUTPUT_SET_PRICE_USD: "OUTPUT_SET_PRICE_USD",
-  OUTPUT_SET_AMOUNT: "OUTPUT_SET_AMOUNT",
-  OUTPUT_SET_SYMBOL: "OUTPUT_SET_SYMBOL",
-  REVERT: "REVERT",
-  SET_SWAP_TYPE: "SET_SWAP_TYPE",
-  LOCK_ON: "LOCK_ON",
-  LOCK_OFF: "LOCK_OFF",
-  REVERT_LOADING_ON: "REVERT_LOADING_ON",
-  REVERT_LOADING_OFF: "REVERT_LOADING_OFF",
-  CALCULATE_LOADING_OFF: "CALCULATE_LOADING_OFF",
-  CALCULATE_LOADING_ON: "CALCULATE_LOADING_ON",
-};
-
-const SWAP_TYPE = {
-  BUY: {
-    EXACT_ETH_FOR_TOKENS: "EXACT_ETH_FOR_TOKENS",
-  },
-  SELL: {
-    EXACT_TOKENS_FOR_ETH: "EXACT_TOKENS_FOR_ETH",
-    TOKENS_FOR_EXACT_ETH: "TOKENS_FOR_EXACT_ETH",
-  },
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case ACTION.INPUT_SET_BALANCE:
-      return { ...state, input: { ...state.input, balance: action.payload } };
-      break;
-    case ACTION.INPUT_SET_PRICE_USD:
-      return { ...state, input: { ...state.input, priceUSD: action.payload } };
-      break;
-    case ACTION.INPUT_SET_AMOUNT:
-      return {
-        ...state,
-        input: { ...state.input, amount: action.payload },
-      };
-      break;
-    case ACTION.INPUT_SET_SYMBOL:
-      return { ...state, input: { ...state.input, symbol: action.payload } };
-      break;
-    case ACTION.OUTPUT_SET_BALANCE:
-      return { ...state, output: { ...state.output, balance: action.payload } };
-      break;
-    case ACTION.OUTPUT_SET_PRICE_USD:
-      return {
-        ...state,
-        output: { ...state.output, priceUSD: action.payload },
-      };
-      break;
-    case ACTION.OUTPUT_SET_AMOUNT:
-      return {
-        ...state,
-        output: { ...state.output, amount: action.payload },
-      };
-      break;
-    case ACTION.OUTPUT_SET_SYMBOL:
-      return { ...state, output: { ...state.output, symbol: action.payload } };
-      break;
-    case ACTION.REVERT:
-      return {
-        ...state,
-        input: state.output,
-        output: state.input,
-        lock: true,
-        swapType:
-          state.input.symbol === "ETH"
-            ? SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH
-            : SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS,
-        revertLoading: state.input.amount === "" ? false : true,
-        calculatePriceLoading: true,
-      };
-      break;
-    case ACTION.LOCK_ON:
-      return {
-        ...state,
-        lock: true,
-      };
-    case ACTION.LOCK_OFF:
-      return {
-        ...state,
-        lock: false,
-        // calculatePriceLoading: false,
-      };
-      break;
-    case ACTION.SET_SWAP_TYPE:
-      return {
-        ...state,
-        swapType: action.payload,
-        calculatePriceLoading: true,
-      };
-      break;
-    case ACTION.REVERT_LOADING_ON:
-      return {
-        ...state,
-        revertLoading: true,
-      };
-    case ACTION.REVERT_LOADING_OFF:
-      return {
-        ...state,
-        revertLoading: false,
-      };
-      break;
-    case ACTION.CALCULATE_LOADING_ON:
-      return {
-        ...state,
-        calculatePriceLoading: true,
-      };
-    case ACTION.CALCULATE_LOADING_OFF:
-      return {
-        ...state,
-        calculatePriceLoading: false,
-      };
-      break;
-
-    default:
-      return state;
-      break;
-  }
-};
-
-const initialState = {
-  input: {
-    balance: 0,
-    priceUSD: 0,
-    amount: "",
-    symbol: "ETH",
-  },
-  output: {
-    balance: 0,
-    priceUSD: 0,
-    amount: "",
-    symbol: "ANQ",
-  },
-  lock: false,
-  swapType: SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS,
-  revertLoading: false,
-  calculatePriceLoading: false,
-};
-// const testTransation = {
-//   transactionHash:
-//     "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-//   transactionIndex: 0,
-//   blockHash:
-//     "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-//   blockNumber: 290,
-//   from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-//   to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
-//   gasUsed: 53756,
-//   cumulativeGasUsed: 53756,
-//   contractAddress: null,
-//   status: true,
-//   logsBloom:
-//     "0x00000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000004000100000000000000008000000000000000000000000000000000180400000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000040040080000000000008000000000000010000000000000000000000000000000000000000000000000000000000000100000000000002000000000400000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000400000000",
-//   events: {
-//     0: {
-//       logIndex: 0,
-//       transactionIndex: 0,
-//       transactionHash:
-//         "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-//       blockHash:
-//         "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-//       blockNumber: 290,
-//       address: "0x437f422B6D48F980778F5Fe53D87c5AeE89Ac289",
-//       type: "mined",
-//       id: "log_d8c26cd4",
-//       returnValues: {},
-//       signature: null,
-//       raw: {
-//         data: "0x000000000000000000000000000000000000000000000000004407316a5ab0ad",
-//         topics: [
-//           "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-//           "0x00000000000000000000000091291b1bc31adb17c3104372a8e5cf1944215e80",
-//           "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-//         ],
-//       },
-//     },
-//     BuyTokens: {
-//       logIndex: 1,
-//       transactionIndex: 0,
-//       transactionHash:
-//         "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-//       blockHash:
-//         "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-//       blockNumber: 290,
-//       address: "0x91291B1BC31adb17c3104372A8e5cf1944215E80",
-//       type: "mined",
-//       id: "log_2b49816b",
-//       returnValues: {
-//         0: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
-//         1: "10000000000000",
-//         2: "19148207235444909",
-//         _buyer: "0x2dCAEbDdc8BFe411BEFCb7dbCf35a85d2ad45F94",
-//         _amountETH: "10000000000000",
-//         _amountANQ: "19148207235444909",
-//       },
-//       event: "BuyTokens",
-//       signature:
-//         "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
-//       raw: {
-//         data: "0x000000000000000000000000000000000000000000000000000009184e72a000000000000000000000000000000000000000000000000000004407316a5ab0ad",
-//         topics: [
-//           "0x0a37b72bb67eee30e09084cf386f8a17817c57f620c3ab95fb25d6a20356ec77",
-//           "0x0000000000000000000000002dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-//         ],
-//       },
-//     },
-//   },
-// };
-
-// const testTransation = {
-//   transactionHash:
-//     "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-//   blockHash:
-//     "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-//   blockNumber: 290,
-//   from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-//   to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
-//   gasUsed: 53756,
-//   fromAmount: web3.utils.fromWei("10000000000000"),
-//   fromSymbol: "ETH",
-//   toAmount: web3.utils.fromWei("19148207235444909"),
-//   toSymbol: "ANQ",
-// };
-
 const Swap = ({
   accounts,
   web3,
@@ -252,369 +18,44 @@ const Swap = ({
   ANQContract,
   connectWallet,
 }) => {
-  const [inputAmountForOneOutput, setInputAmountForOneOutput] = useState("");
   const [transation, setTransation] = useState();
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const {
+    swapState,
+    handleSwap,
+    dispatchSwap,
+    ACTION,
+  } = useSwap();
 
   const [TransationModal, setTransationModal] = useModal();
   const handleQuickAlert = useQuickAlert();
 
   const [AlertConnectWallet, setAlertConnectWallet] = useAlert();
-
   //TODO replace alert universal to quick alert
   const [AlertUniversal, setAlertUniversal] = useAlert();
+
   // const [AlertConfirmation, setAlertConfirmation] = useAlert();
-
-  // update reducer state, get ETH price in USD from coingecko API and set price 1 ANQ
-  useEffect(() => {
-    accounts &&
-      (async () => {
-        setTransation({
-          transactionHash:
-            "0x0d99747b7d207d44422a8324652ec54a58854d86c665d7a21c428c95ae581eb5",
-          blockHash:
-            "0x281a18bfde37fafbbc35d24c41c8eca843e532d7fd7b20049ea6ef62956c83d6",
-          blockNumber: 290,
-          from: "0x2dcaebddc8bfe411befcb7dbcf35a85d2ad45f94",
-          to: "0x91291b1bc31adb17c3104372a8e5cf1944215e80",
-          gasUsed: 53756,
-          fromAmount: web3.utils.fromWei("10000000000000"),
-          fromSymbol: "ETH",
-          toAmount: web3.utils.fromWei("19148207235444909"),
-          toSymbol: "ANQ",
-        });
-        setTransationModal(true);
-
-        dispatch({
-          type: ACTION.INPUT_SET_BALANCE,
-          payload: web3.utils.fromWei(await web3.eth.getBalance(accounts[0])),
-        });
-        dispatch({
-          type: ACTION.OUTPUT_SET_BALANCE,
-          payload: web3.utils.fromWei(
-            await ANQContract.methods.balanceOf(accounts[0]).call()
-          ),
-        });
-        dispatch({
-          type: ACTION.INPUT_SET_AMOUNT,
-          payload: "",
-        });
-        dispatch({
-          type: ACTION.OUTPUT_SET_AMOUNT,
-          payload: "",
-        });
-        const ethPrice = 3243.34;
-        dispatch({
-          type: ACTION.INPUT_SET_PRICE_USD,
-          payload: ethPrice,
-        });
-
-        const amountETHForOneANQ = web3.utils.fromWei(
-          await ANQSwapContract.methods
-            .predirectExactOut(0, web3.utils.toWei("1"))
-            .call()
-        );
-
-        dispatch({
-          type: ACTION.OUTPUT_SET_PRICE_USD,
-          payload: (amountETHForOneANQ * ethPrice).toFixed(8),
-        });
-      })();
-  }, [ANQContract, ANQSwapContract, accounts, web3]);
-
-  const handleSwap = async () => {
-    !state.input.amount || !state.output.amount
-      ? setAlertUniversal("Type amount of tokens to swap form")
-      : (async () => {
-          switch (state.swapType) {
-            case SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS:
-              await ANQSwapContract.methods
-                .swapExactETHForTokens()
-                .send({
-                  from: accounts[0],
-                  value: web3.utils.toWei(state.input.amount),
-                })
-                .on(
-                  "receipt",
-                  ({
-                    transactionHash,
-                    blockHash,
-                    blockNumber,
-                    from,
-                    to,
-                    gasUsed,
-                    events,
-                  }) => {
-                    const parseTransationData = {
-                      transactionHash,
-                      blockHash,
-                      blockNumber,
-                      from,
-                      to,
-                      gasUsed,
-                      fromAmount: web3.utils.fromWei(
-                        events.BuyTokens._amountETH
-                      ),
-                      fromSymbol: "ETH",
-                      toAmount: web3.utils.fromWei(events.BuyTokens._amountANQ),
-                      toSymbol: "ANQ",
-                    };
-
-                    setTransation(parseTransationData);
-                  }
-                )
-                .on("confirmation", (confirmationNumber, receipt) => {
-                  handleQuickAlert({
-                    title: "Confirmation",
-                    message: `Your transation have ${confirmationNumber} confirmation !`,
-                    showTime: 3000,
-                  });
-                })
-                .on("error", (error, receipt) => {
-                  console.log({ error, receipt });
-                });
-              break;
-            case SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH:
-              await ANQContract.methods
-                .approve(
-                  ANQSwapContract.options.address,
-                  web3.utils.toWei(state.input.amount)
-                )
-                .send({ from: accounts[0] });
-
-              await ANQSwapContract.methods
-                .swapExactTokensforETH(web3.utils.toWei(state.input.amount))
-                .send({
-                  from: accounts[0],
-                });
-              break;
-            case SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH:
-              await ANQContract.methods
-                .approve(
-                  ANQSwapContract.options.address,
-                  web3.utils.toWei(state.input.amount)
-                )
-                .send({ from: accounts[0] });
-
-              await ANQSwapContract.methods
-                .swapTokensforExactETH(web3.utils.toWei(state.output.amount))
-                .send({
-                  from: accounts[0],
-                });
-              break;
-            default:
-              setAlertUniversal(
-                "Something went wrong :( Try do swap tokens again or wait a while."
-              );
-              break;
-          }
-        })();
-  };
-
-  // handle revert tokens
-  useDebounce(
-    () => {
-      const prev = state.output.amount;
-      dispatch({
-        type: ACTION.OUTPUT_SET_AMOUNT,
-        payload: "",
-      });
-      dispatch({
-        type: ACTION.OUTPUT_SET_AMOUNT,
-        payload: prev,
-      });
-    },
-    1200,
-    [state.input.symbol]
-  );
-
-  // calculate amount of token from one token from input
-  useDebounce(
-    () => {
-      state.input.amount &&
-        state.output.amount &&
-        (() => {
-          const MULTIPLIER = web3.utils.toBN(10).pow(web3.utils.toBN(18));
-
-          const numerator = web3.utils
-            .toBN(web3.utils.toWei(state.input.amount))
-            .mul(MULTIPLIER);
-
-          const denominator = web3.utils.toBN(
-            web3.utils.toWei(state.output.amount)
-          );
-
-          const amountFromOne = web3.utils.fromWei(numerator.div(denominator));
-          setInputAmountForOneOutput(amountFromOne);
-
-          dispatch({
-            type: ACTION.CALCULATE_LOADING_OFF,
-          });
-        })();
-    },
-    1000,
-    [state.input.amount, state.output.amount]
-  );
-
-  // TODO combine two function to one to update amount (check from triger and call right dispatch)
-  const handleInputAmount = useCallback(
-    (amount, prevAmount) => {
-      const match = handleInputPattern(amount);
-      !web3 && setAlertConnectWallet(true);
-      match !== null &&
-        (() => {
-          dispatch({
-            type: ACTION.SET_SWAP_TYPE,
-            payload:
-              state.input.symbol === "ETH"
-                ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
-                : SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH,
-          });
-
-          dispatch({
-            type: ACTION.INPUT_SET_AMOUNT,
-            payload: match,
-          });
-        })();
-    },
-    [state.input.symbol, web3]
-  );
-
-  const handleOutputAmount = useCallback(
-    (amount, prevAmount) => {
-      const match = handleInputPattern(amount);
-      !web3 && setAlertConnectWallet(true);
-
-      match !== null &&
-        (() => {
-          dispatch({
-            type: ACTION.SET_SWAP_TYPE,
-            payload:
-              state.input.symbol === "ETH"
-                ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
-                : SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH,
-          });
-
-          dispatch({
-            type: ACTION.OUTPUT_SET_AMOUNT,
-            payload: match,
-          });
-        })();
-    },
-    [state.input.symbol, web3]
-  );
-
-  // to unlock for a short time (lock is to prevent infinity loop)
-  useDebounce(
-    () => {
-      state.lock && dispatch({ type: ACTION.LOCK_OFF });
-    },
-    1100,
-    [state.lock]
-  );
-
-  // Update output amount and lock for a short time
-  useDebounce(
-    async () => {
-      !state.lock &&
-        web3 &&
-        (async () => {
-          const eth =
-            state.input.symbol === "ETH"
-              ? web3.utils.toWei(state.input.amount ? state.input.amount : "0")
-              : 0;
-          const anq =
-            state.input.symbol === "ETH"
-              ? 0
-              : web3.utils.toWei(state.input.amount ? state.input.amount : "0");
-
-          const predirectOut =
-            state.input.amount !== ""
-              ? web3.utils.fromWei(
-                  await ANQSwapContract.methods
-                    .predirectExactOut(eth, anq)
-                    .call()
-                )
-              : "";
-          dispatch({
-            type: ACTION.OUTPUT_SET_AMOUNT,
-            payload: predirectOut,
-            // payload: handleOutputPattern(predirectOut),
-          });
-          dispatch({ type: ACTION.LOCK_ON });
-          dispatch({
-            type: ACTION.REVERT_LOADING_OFF,
-          });
-        })();
-    },
-    1000,
-    [state.input.amount, state.input.symbol]
-  );
-
-  // Update input amount and lock for a short time
-  useDebounce(
-    async () => {
-      !state.lock &&
-        web3 &&
-        (async () => {
-          const eth =
-            state.input.symbol === "ETH"
-              ? 0
-              : web3.utils.toWei(
-                  state.output.amount ? state.output.amount : "0"
-                );
-          const anq =
-            state.input.symbol === "ETH"
-              ? web3.utils.toWei(
-                  state.output.amount ? state.output.amount : "0"
-                )
-              : 0;
-
-          const predirectIn =
-            state.output.amount !== ""
-              ? web3.utils.fromWei(
-                  await ANQSwapContract.methods
-                    .predirectExactIn(eth, anq)
-                    .call()
-                )
-              : "";
-
-          dispatch({
-            type: ACTION.INPUT_SET_AMOUNT,
-            payload: predirectIn,
-            // payload: handleOutputPattern(predirectIn),
-          });
-          dispatch({ type: ACTION.LOCK_ON });
-          dispatch({
-            type: ACTION.REVERT_LOADING_OFF,
-          });
-        })();
-    },
-    1000,
-    [state.output.amount, state.input.symbol]
-  );
 
   //TODO add readOnly mode with infura etc.
 
   return (
     <div className="relative flex items-center justify-center w-max bg-zinc-900 rounded-xl my-5">
       <div className="h-full w-full p-4 text-base">
-        {state.revertLoading && (
+        {swapState.revertLoading && (
           <div className="flex items-center justify-center absolute top-0 left-0 h-full w-full bg-zinc-900/90 rounded-xl z-50">
             Loading...
           </div>
         )}
         <InputFrom
-          balance={state.input.balance}
-          valueOfAmount={state.input.priceUSD}
-          symbol={state.input.symbol}
-          coinAmount={state.input.amount}
-          setCoinAmount={handleInputAmount}
+          // balance={state.input.balance}
+          // valueOfAmount={state.input.priceUSD}
+          // symbol={state.input.symbol}
+          // coinAmount={state.input.amount}
+          // setCoinAmount={handleInputAmount}
         ></InputFrom>
         <div className="flex justify-center pt-4">
           <div
-            onClick={() => dispatch({ type: ACTION.REVERT })}
+            onClick={() => dispatchSwap({ type: ACTION.REVERT })}
             className="tooltip h-12 w-12 bg-zinc-800 rounded-xl relative cursor-pointer hover:bg-zinc-700"
             data-title="Revers swaping tokens"
           >
@@ -624,25 +65,15 @@ const Swap = ({
           </div>
         </div>
         <InputTo
-          balance={state.output.balance}
-          symbol={state.output.symbol}
-          coinAmount={state.output.amount}
-          setCoinAmount={handleOutputAmount}
         ></InputTo>
         <PredirectFromOneInfo
-          inputSymbol={state.input.symbol}
-          outputSymbol={state.output.symbol}
-          inputPriceUSD={state.input.priceUSD}
-          outputPriceUSD={state.output.priceUSD}
-          inputAmountForOneOutput={inputAmountForOneOutput}
-          calculatePriceLoading={state.calculatePriceLoading}
         />
         <div className="flex justify-center flex-col py-2 gap-3">
           <Button onClick={accounts ? handleSwap : connectWallet}>
             {accounts ? "swap" : "connect wallet"}
           </Button>
           <Button
-            onClick={() => dispatch({ type: ACTION.REVERT })}
+            onClick={() => dispatchSwap({ type: ACTION.REVERT })}
             type="ghost"
           >
             <svg
@@ -658,7 +89,7 @@ const Swap = ({
             </svg>
           </Button>
         </div>
-        {/* TODO Add to separate component */}
+        {/* TODO Add transqation content modal to separate component */}
         {/* TODO Add quick alert component ? */}
         <TransationModal
           title="Transation details"

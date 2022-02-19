@@ -1,15 +1,19 @@
 import React from 'react';
+import useSwap from './../hooks/useSwap';
 
-const InputTo = ({ balance, coinAmount, setCoinAmount, symbol }) => {
+const InputTo = ({ 
+  // balance, coinAmount, setCoinAmount, symbol 
+}) => {
+  const { swapState, setOutputAmount } = useSwap();
   return (
     <>
       <p className="pb-0.5 px-4 text-right text-sm text-slate-400">
-        Your balance: {balance ? balance : 0}
+        Your balance: {swapState.output.balance ? swapState.output.balance : 0}
       </p>
       <div className="rounded-xl bg-zinc-800 w-full h-12  text-2xl text-slate-50 font-mono relative">
         <input
-          onChange={(event) => setCoinAmount(event.target.value, coinAmount)}
-          value={coinAmount}
+          onChange={(event) => setOutputAmount(event.target.value)}
+          value={swapState.output.amount}
           type="text"
           inputMode="decimal"
           autoComplete="off"
@@ -22,7 +26,7 @@ const InputTo = ({ balance, coinAmount, setCoinAmount, symbol }) => {
           className="p-4 pr-16 text-right w-full h-full bg-transparent caret-slate-50 focus:outline-none"
         />
         <span className="absolute right-4 top-1/2 -translate-y-1/2">
-          {symbol}
+          {swapState.output.symbol}
         </span>
       </div>
     </>

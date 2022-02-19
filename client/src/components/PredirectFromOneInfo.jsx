@@ -1,21 +1,24 @@
 import React from "react";
 import Loader from "./Loader";
+import useSwap from './../hooks/useSwap';
 
 const PredirectFromOneInfo = ({
-  inputSymbol,
-  outputSymbol,
-  inputPriceUSD,
-  outputPriceUSD,
-  inputAmountForOneOutput,
-  calculatePriceLoading,
+  // inputSymbol,
+  // outputSymbol,
+  // inputPriceUSD,
+  // outputPriceUSD,
+  // inputAmountForOneOutput,
+  // calculatePriceLoading,
 }) => {
+
+    const { swapState } = useSwap();
   return (
     <div
       className="tooltip cursor-help"
       data-title="How much will cost you 1 token which you want to buy"
     >
       <div className="p-1 flex items-center gap-1 h-11">
-        {calculatePriceLoading ? (
+        {swapState.calculatePriceLoading ? (
           <Loader />
         ) : (
           <svg
@@ -28,16 +31,18 @@ const PredirectFromOneInfo = ({
           </svg>
         )}
         <p className=" text-slate-400">
-          {inputAmountForOneOutput
+          {swapState.inputAmountForOneOutput
             ? (() => {
-                return `1 ${outputSymbol} ≈ ${
-                  parseFloat(inputAmountForOneOutput).toFixed(10) +
+                return `1 ${swapState.output.symbol} ≈ ${
+                  parseFloat(swapState.inputAmountForOneOutput).toFixed(10) +
                   " " +
-                  inputSymbol
-                } ($${inputPriceUSD ? inputPriceUSD : "0"})`;
+                  swapState.input.symbol
+                } ($${
+                  swapState.input.priceUSD ? swapState.input.priceUSD : "0"
+                })`;
               })()
             : (() => {
-                return `1 ${outputSymbol} ≈`;
+                return `1 ${swapState.output.symbol} ≈`;
               })()}
         </p>
       </div>

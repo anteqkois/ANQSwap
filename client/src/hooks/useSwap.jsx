@@ -15,10 +15,10 @@ import useDebounce from './useDebounce';
 import useAlert from './useAlert';
 
 import ACTION from '../constants/actionSwap'
-import SWAP_TYPE from './../constants/swapType';
+import SWAP_TYPE from '../constants/swapType';
 
 import { handleInputPattern } from "../helpers/amountPattern";
-import Button from './../components/utils/Button';
+import Button from '../components/utils/Button';
 
 const reducer = (state, action) => {
   switch (action.type) {
