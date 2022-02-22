@@ -1,13 +1,13 @@
 import React from "react";
 import { QuickAlertProvider } from "./hooks/useQuickAlert";
 import { Web3Provider } from "./hooks/useWeb3";
-import { SwapProvider } from "./hooks/useSwap";
+import { SwapStoreProvider } from "./hooks/useSwap";
 
 const ProvidersRoot = ({ children }) => {
   return (
     <QuickAlertProvider>
       <Web3Provider>
-        <SwapProvider>{children}</SwapProvider>
+        <SwapStoreProvider>{children}</SwapStoreProvider>
       </Web3Provider>
     </QuickAlertProvider>
   );

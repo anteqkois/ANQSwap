@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import useModal from "../hooks/useModal";
-import useSwap from "./../hooks/useSwap";
+import { useSwapState, useSwapDispatch, useSwap } from "../hooks/useSwap";
 import useAlert from "../hooks/useAlert";
 import useQuickAlert from "../hooks/useQuickAlert";
 
@@ -20,12 +20,9 @@ const Swap = ({
 }) => {
   const [transation, setTransation] = useState();
 
-  const {
-    swapState,
-    handleSwap,
-    dispatchSwap,
-    ACTION,
-  } = useSwap();
+  const { handleSwap } = useSwap();
+  const { state : swapState } = useSwapState();
+  const { dispatch: swapDispatch, ACTION } = useSwapDispatch();
 
   const [TransationModal, setTransationModal] = useModal();
   const handleQuickAlert = useQuickAlert();
@@ -46,16 +43,10 @@ const Swap = ({
             Loading...
           </div>
         )}
-        <InputFrom
-          // balance={state.input.balance}
-          // valueOfAmount={state.input.priceUSD}
-          // symbol={state.input.symbol}
-          // coinAmount={state.input.amount}
-          // setCoinAmount={handleInputAmount}
-        ></InputFrom>
+        <InputFrom />
         <div className="flex justify-center pt-4">
           <div
-            onClick={() => dispatchSwap({ type: ACTION.REVERT })}
+            onClick={() => swapDispatch({ type: ACTION.REVERT })}
             className="tooltip h-12 w-12 bg-zinc-800 rounded-xl relative cursor-pointer hover:bg-zinc-700"
             data-title="Revers swaping tokens"
           >
@@ -64,16 +55,14 @@ const Swap = ({
             <span className="w-1 h-4 rounded-tl rounded-tr bg-zinc-900 absolute left-1/2 top-1/2 -translate-y-0.5 -translate-x-1/2 -rotate-45 origin-bottom"></span>
           </div>
         </div>
-        <InputTo
-        ></InputTo>
-        <PredirectFromOneInfo
-        />
+        <InputTo />
+        <PredirectFromOneInfo />
         <div className="flex justify-center flex-col py-2 gap-3">
           <Button onClick={accounts ? handleSwap : connectWallet}>
             {accounts ? "swap" : "connect wallet"}
           </Button>
           <Button
-            onClick={() => dispatchSwap({ type: ACTION.REVERT })}
+            onClick={() => swapDispatch({ type: ACTION.REVERT })}
             type="ghost"
           >
             <svg

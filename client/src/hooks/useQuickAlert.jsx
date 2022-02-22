@@ -21,6 +21,7 @@ export const QuickAlertProvider = ({ children }) => {
       }}
     >
       <Alert title={title} type={type} showTime={showTime}>
+        {/* Allow to pass not only text, but also components */}
         {message}
       </Alert>
       {children}
@@ -28,16 +29,11 @@ export const QuickAlertProvider = ({ children }) => {
   );
 };
 
-const useQuickAlertContext = () => {
+const useQuickAlert = () => {
   const { setAlert, setTitle, setMessage, setType, setShowTime } =
     useContext(QuickAlertContext);
 
-  const handleQuickAlert = ({
-    title,
-    message,
-    type = "success",
-    showTime,
-  }) => {
+  const handleQuickAlert = ({ title, message, type = "alert", showTime }) => {
     setTitle(title);
     setMessage(message);
     setType(type);
@@ -45,8 +41,7 @@ const useQuickAlertContext = () => {
     setAlert(true);
   };
 
-  // This will take (message, type, showTime)
   return handleQuickAlert;
 };
 
-export default useQuickAlertContext;
+export default useQuickAlert;

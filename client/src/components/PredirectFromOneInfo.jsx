@@ -1,17 +1,10 @@
 import React from "react";
 import Loader from "./Loader";
-import useSwap from './../hooks/useSwap';
+import { useSwapState } from "../hooks/useSwap";
 
-const PredirectFromOneInfo = ({
-  // inputSymbol,
-  // outputSymbol,
-  // inputPriceUSD,
-  // outputPriceUSD,
-  // inputAmountForOneOutput,
-  // calculatePriceLoading,
-}) => {
+const PredirectFromOneInfo = () => {
 
-    const { swapState } = useSwap();
+    const { state: swapState } = useSwapState();
   return (
     <div
       className="tooltip cursor-help"

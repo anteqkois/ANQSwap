@@ -1,10 +1,9 @@
 import React from 'react';
-import useSwap from './../hooks/useSwap';
+import { useSwapState, useSwapDispatch } from "../hooks/useSwap";
 
-const InputTo = ({ 
-  // balance, coinAmount, setCoinAmount, symbol 
-}) => {
-  const { swapState, setOutputAmount } = useSwap();
+const InputTo = () => {
+  const { state: swapState } = useSwapState();
+  const { setOutputAmount } = useSwapDispatch();
   return (
     <>
       <p className="pb-0.5 px-4 text-right text-sm text-slate-400">
