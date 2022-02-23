@@ -3,8 +3,9 @@ import useContracts from "../useContracts";
 import useWeb3 from "../useWeb3";
 import useDebounce from "../useDebounce";
 import useAlert from "../useAlert";
-
 import ACTION from "../../constants/actionSwap";
+import action from "./swapDispatchAction";
+
 import SWAP_TYPE from "../../constants/swapType";
 
 import { handleInputPattern } from "../../helpers/amountPattern";
@@ -14,37 +15,29 @@ const reducer = (state, action) => {
   switch (action.type) {
     case ACTION.INPUT_SET_BALANCE:
       return { ...state, input: { ...state.input, balance: action.payload } };
-      break;
     case ACTION.INPUT_SET_PRICE_USD:
       return { ...state, input: { ...state.input, priceUSD: action.payload } };
-      break;
     case ACTION.INPUT_SET_AMOUNT:
       return {
         ...state,
         input: { ...state.input, amount: action.payload },
       };
-      break;
     case ACTION.INPUT_SET_SYMBOL:
       return { ...state, input: { ...state.input, symbol: action.payload } };
-      break;
     case ACTION.OUTPUT_SET_BALANCE:
       return { ...state, output: { ...state.output, balance: action.payload } };
-      break;
     case ACTION.OUTPUT_SET_PRICE_USD:
       return {
         ...state,
         output: { ...state.output, priceUSD: action.payload },
       };
-      break;
     case ACTION.OUTPUT_SET_AMOUNT:
       return {
         ...state,
         output: { ...state.output, amount: action.payload },
       };
-      break;
     case ACTION.OUTPUT_SET_SYMBOL:
       return { ...state, output: { ...state.output, symbol: action.payload } };
-      break;
     case ACTION.REVERT:
       return {
         ...state,
@@ -58,7 +51,6 @@ const reducer = (state, action) => {
         revertLoading: state.input.amount === "" ? false : true,
         calculatePriceLoading: true,
       };
-      break;
     case ACTION.LOCK_ON:
       return {
         ...state,
@@ -70,14 +62,12 @@ const reducer = (state, action) => {
         lock: false,
         // calculatePriceLoading: false,
       };
-      break;
     case ACTION.SET_SWAP_TYPE:
       return {
         ...state,
         swapType: action.payload,
         calculatePriceLoading: true,
       };
-      break;
     case ACTION.REVERT_LOADING_ON:
       return {
         ...state,
@@ -88,7 +78,11 @@ const reducer = (state, action) => {
         ...state,
         revertLoading: false,
       };
-      break;
+    case ACTION.SET_IN_FOR_ONE_OUT:
+      return {
+        ...state,
+        revertLoading: action.payload,
+      };
     case ACTION.CALCULATE_LOADING_ON:
       return {
         ...state,
@@ -99,11 +93,8 @@ const reducer = (state, action) => {
         ...state,
         calculatePriceLoading: false,
       };
-      break;
-
     default:
       return state;
-      break;
   }
 };
 
@@ -123,6 +114,7 @@ const initialState = {
   lock: false,
   swapType: SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS,
   revertLoading: false,
+  inForOneOut: null,
   calculatePriceLoading: false,
 };
 
@@ -139,30 +131,25 @@ export const SwapStoreProvider = ({ children }) => {
   //Set initial value after connect to web3
   useEffect(() => {
     accounts &&
+      ANQSwapContract &&
       (async () => {
-        dispatch({
-          type: ACTION.INPUT_SET_BALANCE,
-          payload: web3.utils.fromWei(await web3.eth.getBalance(accounts[0])),
-        });
-        dispatch({
-          type: ACTION.OUTPUT_SET_BALANCE,
-          payload: web3.utils.fromWei(
-            await ANQContract.methods.balanceOf(accounts[0]).call()
-          ),
-        });
-        dispatch({
-          type: ACTION.INPUT_SET_AMOUNT,
-          payload: "",
-        });
-        dispatch({
-          type: ACTION.OUTPUT_SET_AMOUNT,
-          payload: "",
-        });
+        dispatch(
+          action.inputSetBalance(
+            web3.utils.fromWei(await web3.eth.getBalance(accounts[0]))
+          )
+        );
+        dispatch(
+          action.outputSetBalance(
+            web3.utils.fromWei(
+              await ANQContract.methods.balanceOf(accounts[0]).call()
+            )
+          )
+        );
+        dispatch(action.inputSetAmount(""));
+        dispatch(action.outputSetAmount(""));
+
         const ethPrice = 3243.34;
-        dispatch({
-          type: ACTION.INPUT_SET_PRICE_USD,
-          payload: ethPrice,
-        });
+        dispatch(action.inputSetPriceUSD(ethPrice));
 
         const amountETHForOneANQ = web3.utils.fromWei(
           await ANQSwapContract.methods
@@ -170,25 +157,47 @@ export const SwapStoreProvider = ({ children }) => {
             .call()
         );
 
-        dispatch({
-          type: ACTION.OUTPUT_SET_PRICE_USD,
-          payload: (amountETHForOneANQ * ethPrice).toFixed(8),
-        });
+        dispatch(
+          action.outputSetPriceUSD((amountETHForOneANQ * ethPrice).toFixed(8))
+        );
       })();
   }, [ANQContract, ANQSwapContract, accounts, web3]);
+
+  // calculate amount of token from one token from input
+  useDebounce(
+    () => {
+      state.input.amount &&
+        state.output.amount &&
+        (() => {
+          const MULTIPLIER = web3.utils.toBN(10).pow(web3.utils.toBN(18));
+
+          const numerator = web3.utils
+            .toBN(web3.utils.toWei(state.input.amount))
+            .mul(MULTIPLIER);
+
+          const denominator = web3.utils.toBN(
+            web3.utils.toWei(state.output.amount)
+          );
+
+          const amountFromOne = web3.utils.fromWei(numerator.div(denominator));
+          dispatch(action.setInForOneOut(amountFromOne));
+
+          // What this do ?
+          // dispatch({
+          //   type: ACTION.CALCULATE_LOADING_OFF,
+          // });
+        })();
+    },
+    1000,
+    [state.input.amount, state.output.amount]
+  );
 
   // to handle revert tokens, first set to ""  that to triger other update useEffect
   useDebounce(
     () => {
       const prev = state.output.amount;
-      dispatch({
-        type: ACTION.OUTPUT_SET_AMOUNT,
-        payload: "",
-      });
-      dispatch({
-        type: ACTION.OUTPUT_SET_AMOUNT,
-        payload: prev,
-      });
+      dispatch(action.outputSetAmount(""));
+      dispatch(action.outputSetAmount(prev));
     },
     1200,
     [state.input.symbol]
@@ -203,18 +212,15 @@ export const SwapStoreProvider = ({ children }) => {
       !web3 && setAlertConnectWallet(true);
       match !== null &&
         (() => {
-          dispatch({
-            type: ACTION.SET_SWAP_TYPE,
-            payload:
+          dispatch(
+            action.setSwapType(
               state.input.symbol === "ETH"
                 ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
-                : SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH,
-          });
+                : SWAP_TYPE.SELL.EXACT_TOKENS_FOR_ETH
+            )
+          );
 
-          dispatch({
-            type: ACTION.INPUT_SET_AMOUNT,
-            payload: match,
-          });
+          dispatch(action.inputSetAmount(match));
         })();
     },
     [state.input.symbol, web3]
@@ -227,31 +233,24 @@ export const SwapStoreProvider = ({ children }) => {
 
       match !== null &&
         (() => {
-          dispatch({
-            type: ACTION.SET_SWAP_TYPE,
-            payload:
+          dispatch(
+            action.setSwapType(
               state.input.symbol === "ETH"
                 ? SWAP_TYPE.BUY.EXACT_ETH_FOR_TOKENS
-                : SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH,
-          });
+                : SWAP_TYPE.SELL.TOKENS_FOR_EXACT_ETH
+            )
+          );
 
-          dispatch({
-            type: ACTION.OUTPUT_SET_AMOUNT,
-            payload: match,
-          });
+          dispatch(action.outputSetAmount(match));
         })();
     },
     [state.input.symbol, web3]
   );
 
   // to unlock after a short time (lock is to prevent infinity loop)
-  useDebounce(
-    () => {
-      state.lock && dispatch({ type: ACTION.LOCK_OFF });
-    },
-    1100,
-    [state.lock]
-  );
+  useDebounce(() => state.lock && dispatch(action.lockOff()), 1100, [
+    state.lock,
+  ]);
 
   // Update output amount if input change and lock for a short time to prevent infinite loop with useDebounce
   useDebounce(
@@ -276,15 +275,10 @@ export const SwapStoreProvider = ({ children }) => {
                     .call()
                 )
               : "";
-          dispatch({
-            type: ACTION.OUTPUT_SET_AMOUNT,
-            payload: predirectOut,
-            // payload: handleOutputPattern(predirectOut),
-          });
-          dispatch({ type: ACTION.LOCK_ON });
-          dispatch({
-            type: ACTION.REVERT_LOADING_OFF,
-          });
+          dispatch(action.outputSetAmount(predirectOut));
+          // payload: handleOutputPattern(predirectOut),
+          dispatch(action.lockOn());
+          dispatch(action.revertLoadingOff());
         })();
     },
     1000,
@@ -319,15 +313,10 @@ export const SwapStoreProvider = ({ children }) => {
                 )
               : "";
 
-          dispatch({
-            type: ACTION.INPUT_SET_AMOUNT,
-            payload: predirectIn,
-            // payload: handleOutputPattern(predirectIn),
-          });
-          dispatch({ type: ACTION.LOCK_ON });
-          dispatch({
-            type: ACTION.REVERT_LOADING_OFF,
-          });
+          dispatch(action.inputSetAmount(predirectIn));
+          // payload: handleOutputPattern(predirectIn),
+          dispatch(action.lockOn());
+          dispatch(action.revertLoadingOff());
         })();
     },
     1000,
@@ -340,7 +329,7 @@ export const SwapStoreProvider = ({ children }) => {
         dispatch,
         setInputAmount,
         setOutputAmount,
-        ACTION,
+        action,
       }}
     >
       <SwapStateContext.Provider

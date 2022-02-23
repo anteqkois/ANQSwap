@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useSwapState } from "./useSwapStore";
 import useQuickAlert from "./../useQuickAlert";
 import useWeb3 from "./../useWeb3";
 import useContracts from "./../useContracts";
 import SWAP_TYPE from "./../../constants/swapType";
-import useDebounce from './../useDebounce';
+import useDebounce from "./../useDebounce";
 
 const useSwap = () => {
- // Amount of input tokens for one output token
-  const [inForOneOut, setinForOneOut] = useState("");
+  // Amount of input tokens for one output token
+  // const [inForOneOut, setinForOneOut] = useState("");
   const [transationData, setTransationData] = useState();
 
   const { state: swapState } = useSwapState();
@@ -16,34 +16,39 @@ const useSwap = () => {
   const { ANQContract, ANQSwapContract } = useContracts();
   const quickAlert = useQuickAlert();
 
-  // calculate amount of token from one token from input
-  useDebounce(
-    () => {
-      swapState.input.amount &&
-        swapState.output.amount &&
-        (() => {
-          const MULTIPLIER = web3.utils.toBN(10).pow(web3.utils.toBN(18));
+  const parseTransationData = useCallback(
+    (
+      { transactionHash, blockHash, blockNumber, from, to, gasUsed, events },
+      type
+    ) => {
+      const dependents =
+        type === "buy"
+          ? {
+              fromAmount: web3.utils.fromWei(events.BuyTokens._amountETH),
+              fromSymbol: "ETH",
+              toAmount: web3.utils.fromWei(events.BuyTokens._amountANQ),
+              toSymbol: "ANQ",
+            }
+          : {
+              fromAmount: web3.utils.fromWei(events.SellTokens._amountANQ),
+              fromSymbol: "ANQ",
+              toAmount: web3.utils.fromWei(events.SellTokens._amountETH),
+              toSymbol: "ETH",
+            };
 
-          const numerator = web3.utils
-            .toBN(web3.utils.toWei(swapState.input.amount))
-            .mul(MULTIPLIER);
-
-          const denominator = web3.utils.toBN(
-            web3.utils.toWei(swapState.output.amount)
-          );
-
-          const amountFromOne = web3.utils.fromWei(numerator.div(denominator));
-          setinForOneOut(amountFromOne);
-
-          // What tiis do ?
-          // dispatch({
-          //   type: ACTION.CALCULATE_LOADING_OFF,
-          // });
-        })();
+      return {
+        transactionHash,
+        blockHash,
+        blockNumber,
+        from,
+        to,
+        gasUsed,
+        ...dependents,
+      };
     },
-    1000,
-    [swapState.input.amount, swapState.output.amount]
+    [web3]
   );
+
 
   const handleSwap = async () => {
     !swapState.input.amount || !swapState.output.amount
@@ -61,35 +66,9 @@ const useSwap = () => {
                   from: accounts[0],
                   value: web3.utils.toWei(swapState.input.amount),
                 })
-                .on(
-                  "receipt",
-                  ({
-                    transactionHash,
-                    blockHash,
-                    blockNumber,
-                    from,
-                    to,
-                    gasUsed,
-                    events,
-                  }) => {
-                    const parseTransationData = {
-                      transactionHash,
-                      blockHash,
-                      blockNumber,
-                      from,
-                      to,
-                      gasUsed,
-                      fromAmount: web3.utils.fromWei(
-                        events.BuyTokens._amountETH
-                      ),
-                      fromSymbol: "ETH",
-                      toAmount: web3.utils.fromWei(events.BuyTokens._amountANQ),
-                      toSymbol: "ANQ",
-                    };
-
-                    setTransationData(parseTransationData);
-                  }
-                )
+                .on("receipt", (receipt) => {
+                  setTransationData(parseTransationData(receipt));
+                })
                 .on("confirmation", (confirmationNumber, receipt) => {
                   quickAlert({
                     title: "Confirmation",
@@ -142,7 +121,7 @@ const useSwap = () => {
         })();
   };
 
-  return { handleSwap, transationData, inForOneOut };
+  return { handleSwap, transationData };
 };
 
 export default useSwap;

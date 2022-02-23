@@ -21,8 +21,8 @@ const Swap = ({
   const [transation, setTransation] = useState();
 
   const { handleSwap } = useSwap();
-  const { state : swapState } = useSwapState();
-  const { dispatch: swapDispatch, ACTION } = useSwapDispatch();
+  const { state: swapState } = useSwapState();
+  const { dispatch: swapDispatch, action } = useSwapDispatch();
 
   const [TransationModal, setTransationModal] = useModal();
   const handleQuickAlert = useQuickAlert();
@@ -46,7 +46,7 @@ const Swap = ({
         <InputFrom />
         <div className="flex justify-center pt-4">
           <div
-            onClick={() => swapDispatch({ type: ACTION.REVERT })}
+            onClick={() => swapDispatch(action.revert())}
             className="tooltip h-12 w-12 bg-zinc-800 rounded-xl relative cursor-pointer hover:bg-zinc-700"
             data-title="Revers swaping tokens"
           >
@@ -61,10 +61,7 @@ const Swap = ({
           <Button onClick={accounts ? handleSwap : connectWallet}>
             {accounts ? "swap" : "connect wallet"}
           </Button>
-          <Button
-            onClick={() => swapDispatch({ type: ACTION.REVERT })}
-            type="ghost"
-          >
+          <Button onClick={() => swapDispatch(action.revert())} type="ghost">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               x="0px"

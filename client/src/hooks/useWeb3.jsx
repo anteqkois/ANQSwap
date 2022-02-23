@@ -37,6 +37,7 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
+  //TODO Add alert if user doens't open extension to login
   const handleConnectWallet = async () => {
     try {
       if (!window.ethereum)
